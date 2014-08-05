@@ -1988,7 +1988,7 @@ var commands = exports.commands = {
 			"<center>" +
 				"<img src=\"http://i.imgur.com/yZ6G3fS.png\" />" +
 				"<div class=\"clan-info\">" +
-					'<h3>' + Tools.escapeHTML(Clans.getClanName(target)) + '</h3>' +
+					'<h1>' + Tools.escapeHTML(Clans.getClanName(target)) + '</h1>' +
 					(info.logo ? '<img src="' + encodeURI(info.logo) + '" />' : '') +
 					'<hr />' +
 					"<strong>Ranking:</strong> " + clan.ratingName + "<br />" +
