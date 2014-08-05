@@ -1917,6 +1917,7 @@ var commands = exports.commands = {
 			"/borrarclan &lt;name> - Borra un clan.<br />" +
 			"/anadirmiembro &lt;clan>, &lt;user> - Añade un miembro a un clan.<br />" +
 			"/borrarmiembro &lt;clan>, &lt;user> - Remueve un miembro de un clan.<br />" +
+			"/setclanlogo &lt;clan>, &lt;uri> - Sets the clan's logo.<br />" +
 			"Comandos de Guerras<br />" +
 			"/cwdisponible - Marca como disponible a un usuario para participar en guerras de clanes.<br />" +
 			"/crearwar &lt;clan 1>, &lt;clan 2> - Empieza una guerra entre dos clanes.<br />" +
@@ -1971,12 +1972,16 @@ var commands = exports.commands = {
 			return;
 		}
 
+		var info = Clans.getClanInfo(target);
 		this.sendReplyBox(
-			'<h3>' + Tools.escapeHTML(Clans.getClanName(target)) + '</h3><hr />' +
+			'<h3>' + Tools.escapeHTML(Clans.getClanName(target)) + '</h3>' +
+			(info.logo ? '<img src="' + encodeURI(info.logo) + '" />' : '') +
+			'<hr />' +
 			"<strong>Ranking:</strong> " + clan.ratingName + "<br />" +
 			"<strong>Puntos:</strong> " + clan.rating + "<br />" +
 			"<strong>Guerras Ganadas:</strong> " + clan.wins + " / <strong>Guerras Perdidas:</strong> " + clan.losses + " / <strong>Empates:</strong> " + clan.draws + '<br />' +
-			"<strong>Miembros:</strong> " + Tools.escapeHTML(Clans.getMembers(target).sort().join(", "))
+			"<strong>Miembros:</strong> " + Tools.escapeHTML(Clans.getMembers(target).sort().join(", ")) +
+			(Rooms.get(toId(target)) ? '<br /><button name="joinRoom" value="' + toId(target) + '">Join room</button>' : '')
 		);
 	},
 
@@ -2006,6 +2011,21 @@ var commands = exports.commands = {
 		else {
 			this.sendReply("User: " + params[1] + " successfully removed from the clan.");
 			Rooms.rooms.lobby.add('|raw|<div class="clans-user-join">' + Tools.escapeHTML(params[1]) + " ha salido del clan: " + Tools.escapeHTML(Clans.getClanName(params[0])) + '</div>');
+		}
+	},
+
+	setclanlogo: function (target) {
+		if (!this.can('clans')) return false;
+		var params = target.split(',');
+		if (params.length !== 2) return this.sendReply("Usage: /setclanlogo clan, uri");
+
+		var info = Clans.getClanInfo(params[0]);
+		if (!info)
+			this.sendReply("Could not get clan info. Does the clan exist?");
+		else {
+			info.logo = params[1].trim();
+			Clans.writeClansData();
+			this.sendReply("Clan logo successfully changed.");
 		}
 	},
 

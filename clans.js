@@ -132,6 +132,15 @@ exports.removeMember = function (clan, user) {
 	return true;
 };
 
+exports.getClanInfo = function (clan) {
+	var clanId = toId(clan);
+	if (!clans[clanId])
+		return false;
+	if (!clans[clanId].info)
+		clans[clanId].info = {};
+	return clans[clanId].info;
+}
+
 exports.getWars = function () {
 	return Object.keys(pendingWars).map(function (clan) { return [clan, pendingWars[clan.against]]; });
 };
