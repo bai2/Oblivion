@@ -1957,38 +1957,48 @@ var commands = exports.commands = {
 				clan = Clans.getRating(target);
 		}
 		if (!clan) {
-			this.sendReplyBox(
-				"<strong>Clanes:</strong><br />" +
-				Clans.getClans().map(function (clan) {
-					var result = Clans.getRating(clan);
-					result.name = clan;
-					return result;
-				}).sort(function (a, b) {
-					return b.rating - a.rating;
-				}).map(function (clan) {
-					var buffer = "";
-					if (Rooms.get(toId(clan.name)))
-						buffer += '<a class="ilink" href="/' + toId(clan.name) + '"><strong>' + Tools.escapeHTML(clan.name) + '</strong></a>: ';
-					else
-						buffer += '<strong>' + Tools.escapeHTML(clan.name) + '</strong>: ';
-					return buffer + clan.ratingName + " (" + clan.rating + ") " + clan.wins + "/" + clan.losses + "/" + clan.draws;
-				}).join('<br />')
+			this.sendReply('|raw|' +
+				"<center>" +
+					"<img src=\"http://i.imgur.com/yZ6G3fS.png\" />" +
+					"<div class=\"clans-info\">" +
+						"<strong>Clanes:</strong><br />" +
+						Clans.getClans().map(function (clan) {
+							var result = Clans.getRating(clan);
+							result.name = clan;
+							return result;
+						}).sort(function (a, b) {
+							return b.rating - a.rating;
+						}).map(function (clan) {
+							var buffer = "";
+							if (Rooms.get(toId(clan.name)))
+								buffer += '<a class="ilink" href="/' + toId(clan.name) + '"><strong>' + Tools.escapeHTML(clan.name) + '</strong></a>: ';
+							else
+								buffer += '<strong>' + Tools.escapeHTML(clan.name) + '</strong>: ';
+							return buffer + clan.ratingName + " (" + clan.rating + ") " + clan.wins + "/" + clan.losses + "/" + clan.draws;
+						}).join('<br />') +
+					"</div>" +
+					"<img src=\"http://i.imgur.com/qFllIAe.png\" />" +
+				"</center>"
 			);
 			return;
 		}
 
 		var info = Clans.getClanInfo(target);
 		this.sendReply('|raw|' +
-			'<div class="infobox clan-info">' +
-				'<h3>' + Tools.escapeHTML(Clans.getClanName(target)) + '</h3>' +
-				(info.logo ? '<img src="' + encodeURI(info.logo) + '" />' : '') +
-				'<hr />' +
-				"<strong>Ranking:</strong> " + clan.ratingName + "<br />" +
-				"<strong>Puntos:</strong> " + clan.rating + "<br />" +
-				"<strong>Guerras Ganadas:</strong> " + clan.wins + " / <strong>Guerras Perdidas:</strong> " + clan.losses + " / <strong>Empates:</strong> " + clan.draws + '<br />' +
-				"<strong>Miembros:</strong> " + Tools.escapeHTML(Clans.getMembers(target).sort().join(", ")) +
-				(Rooms.get(toId(target)) ? '<br /><button name="joinRoom" value="' + toId(target) + '">Join room</button>' : '') +
-			'</div>'
+			"<center>" +
+				"<img src=\"http://i.imgur.com/yZ6G3fS.png\" />" +
+				"<div class=\"clan-info\">" +
+					'<h3>' + Tools.escapeHTML(Clans.getClanName(target)) + '</h3>' +
+					(info.logo ? '<img src="' + encodeURI(info.logo) + '" />' : '') +
+					'<hr />' +
+					"<strong>Ranking:</strong> " + clan.ratingName + "<br />" +
+					"<strong>Puntos:</strong> " + clan.rating + "<br />" +
+					"<strong>Guerras Ganadas:</strong> " + clan.wins + " / <strong>Guerras Perdidas:</strong> " + clan.losses + " / <strong>Empates:</strong> " + clan.draws + '<br />' +
+					"<strong>Miembros:</strong> " + Tools.escapeHTML(Clans.getMembers(target).sort().join(", ")) +
+					(Rooms.get(toId(target)) ? '<br /><button name="joinRoom" value="' + toId(target) + '">Join room</button>' : '') +
+				"</div>" +
+				"<img src=\"http://i.imgur.com/qFllIAe.png\" />" +
+			"</center>"
 		);
 	},
 
