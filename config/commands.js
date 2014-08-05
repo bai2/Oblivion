@@ -1973,15 +1973,17 @@ var commands = exports.commands = {
 		}
 
 		var info = Clans.getClanInfo(target);
-		this.sendReplyBox(
-			'<h3>' + Tools.escapeHTML(Clans.getClanName(target)) + '</h3>' +
-			(info.logo ? '<img src="' + encodeURI(info.logo) + '" />' : '') +
-			'<hr />' +
-			"<strong>Ranking:</strong> " + clan.ratingName + "<br />" +
-			"<strong>Puntos:</strong> " + clan.rating + "<br />" +
-			"<strong>Guerras Ganadas:</strong> " + clan.wins + " / <strong>Guerras Perdidas:</strong> " + clan.losses + " / <strong>Empates:</strong> " + clan.draws + '<br />' +
-			"<strong>Miembros:</strong> " + Tools.escapeHTML(Clans.getMembers(target).sort().join(", ")) +
-			(Rooms.get(toId(target)) ? '<br /><button name="joinRoom" value="' + toId(target) + '">Join room</button>' : '')
+		this.sendReply('|raw|' +
+			'<div class="infobox clan-info">' +
+				'<h3>' + Tools.escapeHTML(Clans.getClanName(target)) + '</h3>' +
+				(info.logo ? '<img src="' + encodeURI(info.logo) + '" />' : '') +
+				'<hr />' +
+				"<strong>Ranking:</strong> " + clan.ratingName + "<br />" +
+				"<strong>Puntos:</strong> " + clan.rating + "<br />" +
+				"<strong>Guerras Ganadas:</strong> " + clan.wins + " / <strong>Guerras Perdidas:</strong> " + clan.losses + " / <strong>Empates:</strong> " + clan.draws + '<br />' +
+				"<strong>Miembros:</strong> " + Tools.escapeHTML(Clans.getMembers(target).sort().join(", ")) +
+				(Rooms.get(toId(target)) ? '<br /><button name="joinRoom" value="' + toId(target) + '">Join room</button>' : '') +
+			'</div>'
 		);
 	},
 
