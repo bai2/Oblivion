@@ -1958,7 +1958,7 @@ var commands = exports.commands = {
 		}
 		if (!clan) {
 			this.sendReplyBox(
-				"<strong>Clans:</strong><br />" +
+				"<strong>Clanes:</strong><br />" +
 				Clans.getClans().map(function (clan) {
 					var result = Clans.getRating(clan);
 					result.name = clan;
@@ -1966,7 +1966,12 @@ var commands = exports.commands = {
 				}).sort(function (a, b) {
 					return b.rating - a.rating;
 				}).map(function (clan) {
-					return '<strong>' + Tools.escapeHTML(clan.name) + ':</strong> ' + clan.ratingName + " (" + clan.rating + ") " + clan.wins + "/" + clan.losses + "/" + clan.draws;
+					var buffer = "";
+					if (Rooms.get(toId(clan.name)))
+						buffer += '<a class="ilink" href="/' + toId(clan.name) + '"><strong>' + Tools.escapeHTML(clan.name) + '</strong></a>: ';
+					else
+						buffer += '<strong>' + Tools.escapeHTML(clan.name) + '</strong>: ';
+					return buffer + clan.ratingName + " (" + clan.rating + ") " + clan.wins + "/" + clan.losses + "/" + clan.draws;
 				}).join('<br />')
 			);
 			return;
