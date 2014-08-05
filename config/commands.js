@@ -1014,7 +1014,7 @@ var commands = exports.commands = {
 				immunities.push(type);
 			}
 		});
- 
+
 		var buffer = []
 		buffer.push(pokemon.exists ? "" + target + ' (ignoring abilities):' : '' + target + ':')
 		buffer.push('<span class=\"message-effect-weak\">Weaknesses</span>: ' + (weaknesses.join(', ') || 'None'));
@@ -1975,7 +1975,7 @@ var commands = exports.commands = {
 			'<h3>' + Tools.escapeHTML(Clans.getClanName(target)) + '</h3><hr />' +
 			"<strong>Ranking:</strong> " + clan.ratingName + "<br />" +
 			"<strong>Puntos:</strong> " + clan.rating + "<br />" +
-			"<strong>Guerras Ganadas: " + clan.wins + " / Guerras Perdidas: " + clan.losses + " / Empates: " + clan.draws + '<br />' +
+			"<strong>Guerras Ganadas:</strong> " + clan.wins + " / <strong>Guerras Perdidas:</strong> " + clan.losses + " / <strong>Empates:</strong> " + clan.draws + '<br />' +
 			"<strong>Miembros:</strong> " + Tools.escapeHTML(Clans.getMembers(target).sort().join(", "))
 		);
 	},
