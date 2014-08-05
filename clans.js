@@ -11,9 +11,10 @@ var pendingWars = {};
 exports.clans = clans;
 exports.pendingWars = pendingWars;
 
-function writeClanData() {
+function writeClansData() {
 	fs.writeFileSync(clanDataFile, JSON.stringify(clans));
 }
+exports.writeClansData = writeClansData;
 
 exports.getClans = function () {
 	return Object.keys(clans).map(function (c) { return clans[c].name; });
@@ -60,7 +61,7 @@ exports.createClan = function (name) {
 		draws: 0,
 		rating: 1000
 	};
-	writeClanData();
+	writeClansData();
 
 	return true;
 };
@@ -71,7 +72,7 @@ exports.deleteClan = function (name) {
 		return false;
 
 	delete clans[id];
-	writeClanData();
+	writeClansData();
 
 	return true;
 };
@@ -114,7 +115,7 @@ exports.addMember = function (clan, user) {
 		return false;
 
 	clans[clanId].members[userId] = 1;
-	writeClanData();
+	writeClansData();
 
 	return true;
 };
@@ -126,7 +127,7 @@ exports.removeMember = function (clan, user) {
 		return false;
 
 	delete clans[clanId].members[userId];
-	writeClanData();
+	writeClansData();
 
 	return true;
 };
@@ -225,7 +226,7 @@ exports.setWarResult = function (clanA, clanB, result) {
 		++clans[clanBId].draws;
 	}
 
-	writeClanData();
+	writeClansData();
 
 	return [clans[clanAId].rating, clans[clanBId].rating];
 };
