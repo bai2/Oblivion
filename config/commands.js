@@ -1953,9 +1953,25 @@ var commands = exports.commands = {
 
 		var clan = Clans.getRating(target);
 		if (!clan) {
-			target = Clans.findClanFromMember(target);
-			if (target)
-				clan = Clans.getRating(target);
+			var clanName = Clans.findClanFromMember(target);
+			if (clanName) {
+				target = clanName;
+				clan = Clans.getRating(clanName);
+			}
+		}
+		if (!clan && target.length > 0) {
+			var clans = Clans.getClans().map(toId).sort();
+			var targetId = toId(target);
+			for (var c = 0; c < clans.length; ++c)
+				if (clans[c].slice(0, targetId.length) === targetId) {
+					target = clans[c];
+					clan = Clans.getRating(clans[c]);
+					break;
+				}
+		}
+		if (!clan && target.length > 0) {
+			this.sendReply("No clan or clan member found under '" + target + "'.");
+			return;
 		}
 		if (!clan) {
 			this.sendReply('|raw|' +
