@@ -209,7 +209,7 @@ body {
 }
 
 /* Welcome Message */
-.welcome {
+.welcome, .clans-info, .clan-info {
     background: url(http://i.imgur.com/3lBSg3c.png) center repeat-y;
     color: #fff;
     margin-top: -3px;
@@ -217,11 +217,11 @@ body {
     width: 440px;
 }
 
-.welcome hr {
+.welcome hr, .clans-info hr, .clan-info hr{
     border: 1px dashed #fff;
 }
 
-.welcome button {
+.welcome button, .clans-info button, .clan-info button {
     background: rgb(87, 87, 129);
     color: #fff;
     border: 1px solid #fff;
@@ -229,8 +229,12 @@ body {
     padding: 5px;
 }
 
-.welcome button:hover {
+.welcome button:hover, .clans-info button:hover, .clan-info button:hover {
     background: rgb(33, 37, 66);
+}
+
+.welcome .ilink, .clans-info .ilink, .clan-info .ilink {
+    color: #8cf;
 }
 
 /* Liga */
