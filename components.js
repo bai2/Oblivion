@@ -479,6 +479,48 @@ var components = exports.components = {
             Users.users[i].send(message);
         }
     },
+    
+    medallas: 'medallas',
+	medallas: function (target, room, user) {
+		if (!this.canBroadcast()) return;
+		if (!target) target = user.userid;
+		target = target.toLowerCase();
+		target = target.trim();
+		var matched = false;
+		var admin = '<img src="http://i.imgur.com/lfPYzFG.png" title="Administrador">';
+		var dev = '<img src="http://i.imgur.com/oyv3aga.png" title="Developer ">';
+		var owner = '<img src="http://www.smogon.com/media/forums/images/badges/sitestaff.png.v.W3Bw1cia4qYxYu9_y90uyw" title="Propietario del servidor">';
+		var leader = '<img src="http://i.imgur.com/5Dy544w.png" title="Leader">';
+		var mod = '<img src="http://i.imgur.com/z3W1EAh.png" title="Moderador">';
+		var driver = '<img src="http://i.imgur.com/oeKdHgW.png" title="Driver">';
+		var voice = '<img src="http://i.imgur.com/yPAXWE9.png" title="Vocero">';
+		var artista = '<img src="http://www.smogon.com/forums/styles/default/xenforo/badges/artist.png" title="Artista">';
+		if (target === 'list' || target === 'help') {
+			matched = true;
+			this.sendReplyBox('<center><b><font size="3">Lista de medallas obtenibles:</font></b>  ' + dev + '  ' + leader + '  ' + mod + '  ' + driver + ' ' + voice + '  ' + artista + '<hr>Al pasar el cursor por encima de la medalla revela lo que indica.</center>');
+		}
+		if (target === 'neonnnn' || target === 'neon') {
+			matched = true;
+			this.sendReplyBox('<center><b><font size="3">Neonnnn:</font></b>  ' + owner + '  ' + admin + '  ' + dev + '</center>')
+		}
+		if (!matched) {
+			this.sendReplyBox('<center><font color="grey"><font size="1">El usuario <i>' + target + '</i> no tiene medallas.</font></font><hr><b><font size="3">Lista de medallas obtenibles:</font></b>  ' + dev + '  ' + leader + '  ' + mod + '  ' + driver + ' ' + voice + '  ' + artista + '<hr>Al pasar el cursor por encima de la medalla revela lo que indica.</center>');
+		}
+	},
+	
+	rankingtorneo: 'rankingtorneos',
+    rankingtorneos: function (target, room, user) {
+        if (!this.canBroadcast()) return;
+
+        if (!target) target = 10;
+        if (!/[0-9]/.test(target) && target.toLowerCase() !== 'all') target = -1;
+
+        var ladder = Core.ladder(Number(target));
+        if (ladder === 0) return this.sendReply('Nadie está clasificado.');
+
+        return this.sendReply('|raw|<center>' + ladder + 'Para ver el ranking completo usa /rankingtorneos <em>Todos</em> o para ver una cierta cantidad de usuarios usa /rankingtorneos <em>Número</em></center>');
+
+},
 
     clearall: function (target, room, user) {
         if (!this.can('makeroom')) return this.sendReply('/clearall - Access denied.');
