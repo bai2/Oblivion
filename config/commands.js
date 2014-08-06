@@ -266,7 +266,7 @@ var commands = exports.commands = {
 					"<p>N/A</p>" +
 					"<hr />" +
 					"<div class=\"alto-mando\">" +
-						"<a href=" + path + 252 + "><button>ALTO MANDO</button></a>" +
+						"<a href=" + path + 623 + "><button>ALTO MANDO</button></a>" +
 						"<ul>" +
 							"<li>(LoD)Tyrana: Dragon</li>" +
 							"<li>Shiny Giratina-O: Agua</li>" +
@@ -292,7 +292,7 @@ var commands = exports.commands = {
 								"<tr>" +
 									"<td><a href=" + path + 575 + ">Sonia Nevermind: Hada</a></td>" +
 									"<td><a href=" + path + 570 + ">Miranda L.: Volador</a></td>" +
-									"<td><a href=" + path + 000 + ">Kaido: Fantasma</a></td>" +
+									"<td><a href=" + path + 633 + ">davidness: Fantasma</a></td>" +
 								"</tr>" +
 								"<tr>" +
 									"<td><a href=" + path + 539 + ">Sidaaaaa: Tierra</a></td>" +
