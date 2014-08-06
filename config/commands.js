@@ -1918,6 +1918,7 @@ var commands = exports.commands = {
 			"/anadirmiembro &lt;clan>, &lt;user> - Añade un miembro a un clan.<br />" +
 			"/borrarmiembro &lt;clan>, &lt;user> - Remueve un miembro de un clan.<br />" +
 			"/setclanlogo &lt;clan>, &lt;uri> - Sets the clan's logo.<br />" +
+			"/setclandesc &lt;clan>, &lt;description> - Sets the clan's description.<br />" +
 			"Comandos de Guerras<br />" +
 			"/cwdisponible - Marca como disponible a un usuario para participar en guerras de clanes.<br />" +
 			"/crearwar &lt;clan 1>, &lt;clan 2> - Empieza una guerra entre dos clanes.<br />" +
@@ -1990,6 +1991,7 @@ var commands = exports.commands = {
 				"<div class=\"clan-info\">" +
 					'<h1>' + Tools.escapeHTML(Clans.getClanName(target)) + '</h1>' +
 					(info.logo ? '<img src="' + encodeURI(info.logo) + '" />' : '') +
+					(info.description ? '<p>' + Tools.escapeHTML(info.description) + '</p>' : '') +
 					'<hr />' +
 					"<strong>Ranking:</strong> " + clan.ratingName + "<br />" +
 					"<strong>Puntos:</strong> " + clan.rating + "<br />" +
@@ -2043,6 +2045,21 @@ var commands = exports.commands = {
 			info.logo = params[1].trim();
 			Clans.writeClansData();
 			this.sendReply("Clan logo successfully changed.");
+		}
+	},
+
+	setclandesc: function (target) {
+		if (!this.can('clans')) return false;
+		var params = target.split(',');
+		if (params.length !== 2) return this.sendReply("Usage: /setclanlogo clan, description");
+
+		var info = Clans.getClanInfo(params[0]);
+		if (!info)
+			this.sendReply("Could not get clan info. Does the clan exist?");
+		else {
+			info.description = params[1].trim();
+			Clans.writeClansData();
+			this.sendReply("Clan description successfully changed.");
 		}
 	},
 
