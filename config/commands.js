@@ -257,7 +257,7 @@ var commands = exports.commands = {
 	lideres: 'liga',
 	liga: function (target, room, user) {
 		if (!this.canBroadcast()) return;
-		var path = 'http://pokemon-hispano.comxa.com/showthread.php?tid=623';
+		var path = 'http://pokemon-hispano.comxa.com/showthread.php?tid=';
 		return this.sendReply('|raw|' +
 			"<center>" +
 				"<img src=\"http://i.imgur.com/SU0aFTt.png\" />" +
