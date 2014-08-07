@@ -280,14 +280,14 @@ var commands = exports.commands = {
 						"<h4>LÍDERES DE GIMNASIOS</h4>" +
 							"<table>" +
 								"<tr>" +
-									"<td><a href=" + path + 590 + ">FC CAMULOS: Normal</a></td>" +
-									"<td><a href=" + path + 603 + ">FC Vulcano 3000: Hielo</a></td>" +
-									"<td><a href=" + path + 566 + ">ADRIELANDRO: Agua</a></td>" +
+									"<td><a href=" + path + 000 + ">Disponible: Normal</a></td>" +
+									"<td><a href=" + path + 000 + ">Disponible: Hielo</a></td>" +
+									"<td><a href=" + path + 000 + ">Disponible: Agua</a></td>" +
 								"</tr>" +
 								"<tr>" +
 									"<td><a href=" + path + 563 + ">(ABT) Ryuga: Lucha</a></td>" +
-									"<td><a href=" + path + 000 + ">cusho: Bicho</a></td>" +
-									"<td><a href=" + path + 591 + ">FC Striker: Roca</a></td>" +
+									"<td><a href=" + path + 000 + ">Disponible: Bicho</a></td>" +
+									"<td><a href=" + path + 000 + ">Disponible: Roca</a></td>" +
 								"</tr>" +
 								"<tr>" +
 									"<td><a href=" + path + 575 + ">Sonia Nevermind: Hada</a></td>" +
@@ -296,7 +296,7 @@ var commands = exports.commands = {
 								"</tr>" +
 								"<tr>" +
 									"<td><a href=" + path + 539 + ">Sidaaaaa: Tierra</a></td>" +
-									"<td><a href=" + path + 574 + ">Quiero Pastel A_A: Siniestro</a></td>" +
+									"<td><a href=" + path + 000 + ">Disponible: Siniestro</a></td>" +
 									"<td><a href=" + path + 532 + ">Smorales: Veneno</a></td>" +
 								"</tr>" +
 								"<tr>" +
