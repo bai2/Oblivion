@@ -283,7 +283,7 @@ var commands = exports.commands = {
 								"<tr>" +
 									"<td><a href=" + path + 000 + ">Disponible: Normal</a></td>" +
 									"<td><a href=" + path + 000 + ">Disponible: Hielo</a></td>" +
-									"<td><a href=" + path + 000 + ">Disponible: Agua</a></td>" +
+									"<td><a href=" + path + 629 + ">FC ADRIELANDRO: Agua</a></td>" +
 								"</tr>" +
 								"<tr>" +
 									"<td><a href=" + path + 563 + ">(ABT) Ryuga: Lucha</a></td>" +
