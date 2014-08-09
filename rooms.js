@@ -267,14 +267,14 @@ var GlobalRoom = (function () {
 			time: new Date().getTime()
 		};
 		var self = this;
-		/*user.doWithMMR(formatid, function (mmr, error) {
+		user.doWithMMR(formatid, function (mmr, error) {
 			if (error) {
 				user.popup("Connection to ladder server failed with error: " + error + "; please try again later");
 				return;
 			}
-			newSearch.rating = mmr;*/
+			newSearch.rating = mmr;
 			self.addSearch(newSearch, user);
-		//});
+		});
 	};
 	GlobalRoom.prototype.matchmakingOK = function (search1, search2, user1, user2) {
 		// users must be different
