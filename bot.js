@@ -41,7 +41,7 @@ function joinServer() {
     Users.socketConnect(worker.server, undefined, '1', '254.254.254.254');
 
     for (var i in Users.users) {
-        if (Users.users[i].connections[0].ip === 'bot') {
+        if (Users.users[i].connections[0].ip === '254.254.254.254') {
 
             var bot = Users.users[i];
 
