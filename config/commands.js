@@ -281,7 +281,7 @@ var commands = exports.commands = {
 						"<h4>LÍDERES DE GIMNASIOS</h4>" +
 							"<table>" +
 								"<tr>" +
-									"<td><a href=" + path + 000 + ">Disponible: Normal</a></td>" +
+									"<td><a href=" + path + 628 + ">FC CAMULOS: Normal</a></td>" +
 									"<td><a href=" + path + 000 + ">Disponible: Hielo</a></td>" +
 									"<td><a href=" + path + 629 + ">FC ADRIELANDRO: Agua</a></td>" +
 								"</tr>" +
