@@ -613,16 +613,15 @@ var BattleRoom = (function () {
 					'<strong>' + Tools.escapeHTML(war[0]) + ':</strong> ' + warEnd.oldRatings[0] + " &rarr; " + warEnd.newRatings[0] + " (" + Clans.ratingToName(warEnd.newRatings[0]) + ")<br />" +
 					'<strong>' + Tools.escapeHTML(war[1]) + ':</strong> ' + warEnd.oldRatings[1] + " &rarr; " + warEnd.newRatings[1] + " (" + Clans.ratingToName(warEnd.newRatings[1]) + ")"
 				);
+
+				var fromMoney = Math.floor(warEnd.result * Object.size(warEnd.matchups) * 5);
+				var toMoney = Math.floor((1 - warEnd.result) * Object.size(warEnd.matchups) * 5);
 				for (var m in warEnd.matchups) {
-					Core.stdout('money', toId(warEnd.matchups[m].from), +Core.stdin('money', toId(warEnd.matchups[m].from)) + Math.floor(warEnd.result * Object.size(warEnd.matchups) / 4));
-					Core.stdout('money', toId(warEnd.matchups[m].to), +Core.stdin('money', toId(warEnd.matchups[m].to)) + Math.floor((1 - warEnd.result) * Object.size(warEnd.matchups) / 4));
+					Core.stdout('money', toId(warEnd.matchups[m].from), +Core.stdin('money', toId(warEnd.matchups[m].from)) + fromMoney);
+					Core.stdout('money', toId(warEnd.matchups[m].to), +Core.stdin('money', toId(warEnd.matchups[m].to)) + toMoney);
 				}
-				if (Math.floor(warEnd.result * Object.size(warEnd.matchups) / 4) > 0) {
-					room.add("Each member of " + Tools.escapeHTML(war[0]) + " has won " + Math.floor(warEnd.result * Object.size(warEnd.matchups) / 4) + " PD.");
-				}
-				if (Math.floor((1 - warEnd.result) * Object.size(warEnd.matchups) / 4) > 0) {
-					room.add("Each member of " + Tools.escapeHTML(war[1]) + " has won " + Math.floor(warEnd.result * Object.size(warEnd.matchups) / 4) + " PD.");
-				}
+				if (fromMoney > 0) room.add("Each member of " + Tools.escapeHTML(war[0]) + " has won " + fromMoney + " PD.");
+				if (toMoney > 0) room.add("Each member of " + Tools.escapeHTML(war[1]) + " has won " + toMoney + " PD.");
 			}
 		}
 

@@ -1922,7 +1922,7 @@ var commands = exports.commands = {
 					"<strong>Puntos:</strong> " + clan.rating + "<br />" +
 					"<strong>Guerras Ganadas:</strong> " + clan.wins + " / <strong>Guerras Perdidas:</strong> " + clan.losses + " / <strong>Empates:</strong> " + clan.draws + '<br />' +
 					"<strong>Miembros:</strong> " + Tools.escapeHTML(Clans.getMembers(target).sort().join(", ")) +
-					(Rooms.get(toId(target)) ? '<br /><button name="joinRoom" value="' + toId(target) + '">To Sala</button>' : '') +
+					(Rooms.get(toId(target)) ? '<br /><button name="joinRoom" value="' + toId(target) + '">Sala</button>' : '') +
 				"</div>" +
 				"<img src=\"http://i.imgur.com/qFllIAe.png\" />" +
 			"</center>"
