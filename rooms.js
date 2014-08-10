@@ -319,7 +319,7 @@ var GlobalRoom = (function () {
 		this.searchers.push(newSearch);
 
 		if (!this.pastSearchTimes) this.pastSearchTimes = {};
-		if (!this.pastSearchTimes[newSearch.formatid] || Date.now() > this.pastSearchTimes[newSearch.formatid] + (4).minutes()) {
+		if (!this.pastSearchTimes[newSearch.formatid] || Date.now() > this.pastSearchTimes[newSearch.formatid] + (5).minutes()) {
 			getRoom('lobby').add("|raw|<em>Se está buscando una batalla de <strong><font color=#0058CC>" + Tools.escapeHTML(Tools.getFormat(newSearch.formatid).name) + "</font></strong> en la ladder.</em>");
 		}
 		this.pastSearchTimes[newSearch.formatid] = Date.now();
