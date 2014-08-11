@@ -15,6 +15,11 @@ const REPORT_USER_STATS_INTERVAL = 1000 * 60 * 10;
 
 var fs = require('fs');
 
+/* global Rooms: true */
+var Rooms = module.exports = getRoom;
+
+var rooms = Rooms.rooms = Object.create(null);
+
 var GlobalRoom = (function () {
 	function GlobalRoom(roomid) {
 		this.id = roomid;
@@ -63,7 +68,7 @@ var GlobalRoom = (function () {
 			}
 			var id = toId(this.chatRoomData[i].title);
 			console.log("NEW CHATROOM: " + id);
-			var room = rooms[id] = new ChatRoom(id, this.chatRoomData[i].title, this.chatRoomData[i]);
+			var room = Rooms.createChatRoom(id, this.chatRoomData[i].title, this.chatRoomData[i]);
 			this.chatRooms.push(room);
 			if (room.autojoin) this.autojoin.push(id);
 			if (room.staffAutojoin) this.staffAutojoin.push(id);
@@ -206,18 +211,18 @@ var GlobalRoom = (function () {
 		return roomList;
 	};
 	GlobalRoom.prototype.getRooms = function () {
-		var rooms = {official:[], chat:[], userCount: this.userCount, battleCount: this.battleCount};
+		var roomsData = {official:[], chat:[], userCount: this.userCount, battleCount: this.battleCount};
 		for (var i = 0; i < this.chatRooms.length; i++) {
 			var room = this.chatRooms[i];
 			if (!room) continue;
 			if (room.isPrivate) continue;
-			(room.isOfficial ? rooms.official : rooms.chat).push({
+			(room.isOfficial ? roomsData.official : roomsData.chat).push({
 				title: room.title,
 				desc: room.desc,
 				userCount: Object.size(room.users)
 			});
 		}
-		return rooms;
+		return roomsData;
 	};
 	GlobalRoom.prototype.cancelSearch = function (user) {
 		var success = false;
@@ -355,7 +360,7 @@ var GlobalRoom = (function () {
 		var chatRoomData = {
 			title: title
 		};
-		var room = rooms[id] = new ChatRoom(id, title, chatRoomData);
+		var room = Rooms.createChatRoom(id, title, chatRoomData);
 		this.chatRoomData.push(chatRoomData);
 		this.chatRooms.push(room);
 		this.writeChatRoomData();
@@ -505,7 +510,7 @@ var GlobalRoom = (function () {
 		return newRoom;
 	};
 	GlobalRoom.prototype.addRoom = function (room, format, p1, p2, parent, rated) {
-		room = newRoom(room, format, p1, p2, parent, rated);
+		room = Rooms.createBattle(room, format, p1, p2, parent, rated);
 		if (this.id in room.i) return;
 		room.i[this.id] = this.rooms.length;
 		this.rooms.push(room);
@@ -647,7 +652,7 @@ var BattleRoom = (function () {
 			if (!rated.p1 || !rated.p2) {
 				this.push('|raw|ERROR: Ladder not updated: a player does not exist');
 			} else {
-				var winner = Users.get(winnerid);
+				winner = Users.get(winnerid);
 				if (winner && !winner.authenticated) {
 					this.send('|askreg|' + winner.userid, winner);
 				} else {
@@ -755,8 +760,6 @@ var BattleRoom = (function () {
 				logs[2].push(line);
 			}
 		}
-		var roomid = this.id;
-		var self = this;
 		logs = logs.map(function (log) {
 			return log.join('\n');
 		});
@@ -816,25 +819,6 @@ var BattleRoom = (function () {
 	BattleRoom.prototype.tryExpire = function () {
 		this.expire();
 	};
-	BattleRoom.prototype.reset = function (reload) {
-		clearTimeout(this.resetTimer);
-		this.resetTimer = null;
-		this.resetUser = '';
-
-		if (rooms.global.lockdown) {
-			this.add('La batalla no pudo volver a empezar porque el servidor se está preparando para el apagado.');
-			return;
-		}
-
-		this.add('RESET');
-		this.update();
-
-		rooms.global.battleCount += 0 - (this.active ? 1 : 0);
-		this.active = false;
-		if (this.parentid) {
-			getRoom(this.parentid).updateRooms();
-		}
-	};
 	BattleRoom.prototype.getInactiveSide = function () {
 		if (this.battle.players[0] && !this.battle.players[1]) return 1;
 		if (this.battle.players[1] && !this.battle.players[0]) return 0;
@@ -878,12 +862,12 @@ var BattleRoom = (function () {
 		var inactiveSide = this.getInactiveSide();
 
 		var ticksLeft = [0, 0];
-		if (inactiveSide != 1) {
+		if (inactiveSide !== 1) {
 			// side 0 is inactive
 			this.sideTurnTicks[0]--;
 			this.sideTicksLeft[0]--;
 		}
-		if (inactiveSide != 0) {
+		if (inactiveSide !== 0) {
 			// side 1 is inactive
 			this.sideTurnTicks[1]--;
 			this.sideTicksLeft[1]--;
@@ -960,12 +944,12 @@ var BattleRoom = (function () {
 		}
 		this.sideTicksLeft[0]++;
 		this.sideTicksLeft[1]++;
-		if (inactiveSide != 1) {
+		if (inactiveSide !== 1) {
 			// side 0 is inactive
 			var ticksLeft0 = Math.min(this.sideTicksLeft[0] + 1, maxTicksLeft);
 			this.send('|inactive|Tiens ' + (ticksLeft0 * 10) + ' segundos para hacer tú decisión.', this.battle.getPlayer(0));
 		}
-		if (inactiveSide != 0) {
+		if (inactiveSide !== 0) {
 			// side 1 is inactive
 			var ticksLeft1 = Math.min(this.sideTicksLeft[1] + 1, maxTicksLeft);
 			this.send('|inactive|Tienes ' + (ticksLeft1 * 10) + ' segundos para hacer tú decisión.', this.battle.getPlayer(1));
@@ -1127,7 +1111,7 @@ var BattleRoom = (function () {
 		this.kickInactiveUpdate();
 	};
 	BattleRoom.prototype.joinBattle = function (user, team) {
-		var slot = undefined;
+		var slot;
 		if (this.rated) {
 			if (this.rated.p1 === user.userid) {
 				slot = 0;
@@ -1296,12 +1280,12 @@ var ChatRoom = (function () {
 	};
 
 	ChatRoom.prototype.rollLogFile = function (sync) {
-		var mkdir = sync ? (function (path, mode, callback) {
+		var mkdir = sync ? function (path, mode, callback) {
 			try {
 				fs.mkdirSync(path, mode);
 			} catch (e) {}	// directory already exists
 			callback();
-		}) : fs.mkdir;
+		} : fs.mkdir;
 		var date = new Date();
 		var basepath = 'logs/chat/' + this.id + '/';
 		var self = this;
@@ -1603,16 +1587,17 @@ var ChatRoom = (function () {
 })();
 
 // to make sure you don't get null returned, pass the second argument
-var Rooms = module.exports = function (roomid, fallback) {
+function getRoom(roomid, fallback) {
 	if (roomid && roomid.id) return roomid;
 	if (!roomid) roomid = 'default';
 	if (!rooms[roomid] && fallback) {
 		return rooms.global;
 	}
 	return rooms[roomid];
-};
-var getRoom = Rooms.get = Rooms;
-var newRoom = Rooms.create = function (roomid, format, p1, p2, parent, rated) {
+}
+Rooms.get = getRoom;
+
+Rooms.createBattle = function (roomid, format, p1, p2, parent, rated) {
 	if (roomid && roomid.id) return roomid;
 	if (!p1 || !p2) return false;
 	if (!roomid) roomid = 'default';
@@ -1624,8 +1609,14 @@ var newRoom = Rooms.create = function (roomid, format, p1, p2, parent, rated) {
 	}
 	return rooms[roomid];
 };
+Rooms.createChatRoom = function (roomid, title, data) {
+	var room;
+	if ((room = rooms[roomid])) return room;
 
-var rooms = Rooms.rooms = Object.create(null);
+	room = rooms[roomid] = new ChatRoom(roomid, title, data);
+	return room;
+};
+
 console.log("NEW GLOBAL: global");
 rooms.global = new GlobalRoom('global');
 
