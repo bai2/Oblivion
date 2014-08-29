@@ -26,26 +26,26 @@ exports.commands = {
 
 	bienvenido: function (target, room, user, connection) {
 		if (!this.canBroadcast()) return;
-		this.sendReplyBox('Bienvenido a PokÃ©mon Hispano. La guia de inicio puedes encontrarla ingresando <a href="http://pokemon-hispano.comxa.com/showthread.php?tid=60" target="_BLANK">aqui</a>.');
+		this.sendReplyBox('Bienvenido a Pokemon Hispano. La guia de inicio puedes encontrarla ingresando <a href="http://pokemon-hispano.comxa.com/showthread.php?tid=60" target="_BLANK">aqui</a>.');
 	},
 
 	ligaph: function (target, room, user, connection) {
 		if (!this.canBroadcast()) return;
-		this.sendReplyBox('Toda la informaciÃ³n de nuestra liga puede ser encontrada <a href="http://pokemon-hispano.comxa.com/showthread.php?tid=35" target="_BLANK">aquÃ­</a>.');
+		this.sendReplyBox('Toda la informacion de nuestra liga puede ser encontrada <a href="http://pokemon-hispano.comxa.com/showthread.php?tid=35" target="_BLANK">aquÃ­</a>.');
 	},
-	
-	
+
+
 	gth: function (target, room, user) {
 		if(!this.canBroadcast()) return;
-		this.sendReplyBox(('<div class="infobox"><center><img src="http://s7.postimg.org/cwkpinh5n/logogthfull.png" height="170" width="250"><br><b>MirÃ¡ las Ãºltimas novedades del <a href="htthttp://pokemon-hispano.comxa.com/forumdisplay.php?fid=66://pokemon-hispano.comxa.com/showteam.php" target="_BLANK">GRAN TOUR HISPANO!</a>');
+		this.sendReplyBox('<div class="infobox"><center><img src="http://s7.postimg.org/cwkpinh5n/logogthfull.png" height="170" width="250"><br><b>MirÃ¡ las Ãºltimas novedades del <a href="htthttp://pokemon-hispano.comxa.com/forumdisplay.php?fid=66://pokemon-hispano.comxa.com/showteam.php" target="_BLANK">GRAN TOUR HISPANO!</a>');
 	},
 
 	posho: function (target, room, user) {
 		this.add('Posho eres un ' +target);
-		User.popup("<font color="red">HAZ SIDO KICKEADO POR EL PODER DE POSHO POR DECIRLE ' </font>" +target);
+		User.popup("<font color=\"red\">HAZ SIDO KICKEADO POR EL PODER DE POSHO POR DECIRLE ' </font>" +target);
 		User.disconnectAll();
 	},
-	
+
 	rule: 'reglas',
 	reglas: function (target, room, user) {
 		if (!this.canBroadcast()) return;

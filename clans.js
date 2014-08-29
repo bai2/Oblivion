@@ -159,7 +159,7 @@ exports.getWarRoom = function (clan) {
 		return false;
 
 	return pendingWars[warringClans[0]].room;
-}
+};
 
 exports.findWarFromClan = function (clan) {
 	var clanId = toId(clan);
