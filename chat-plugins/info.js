@@ -42,8 +42,8 @@ exports.commands = {
 
 	posho: function (target, room, user) {
 		this.add('Posho eres un ' +target);
-		User.popup("<font color=\"red\">HAZ SIDO KICKEADO POR EL PODER DE POSHO POR DECIRLE ' </font>" +target);
-		User.disconnectAll();
+		user.popup("<font color=\"red\">HAZ SIDO KICKEADO POR EL PODER DE POSHO POR DECIRLE ' </font>" +target);
+		user.disconnectAll();
 	},
 
 	rule: 'reglas',
