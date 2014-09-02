@@ -721,7 +721,7 @@ var BattleRoom = (function () {
 					this.sendUser(winner, '|askreg|' + winner.userid);
 				} else {
 					Core.stdout('money', winnerid, +Core.stdin('money', winnerid) + 1);
-					this.send("|raw|<strong>Tú Ganaste 1 PD</strong>", winner);
+					this.sendUser(winner, "|raw|<strong>Tú Ganaste 1 PD</strong>");
 				}
 				var p1rating, p2rating;
 				// update rankings
