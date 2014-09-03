@@ -290,23 +290,23 @@ var commands = exports.commands = {
 								"</tr>" +
 								"<tr>" +
 									"<td><a href=" + path + 563 + ">(ABT) Ryuga: Lucha</a></td>" +
-									"<td><a href=" + path + 000 + ">Disponible: Bicho</a></td>" +
+									"<td><a href=" + path + 648 + ">AlyssaSoraya: Bicho</a></td>" +
 									"<td><a href=" + path + 000 + ">Disponible: Roca</a></td>" +
 								"</tr>" +
 								"<tr>" +
-									"<td><a href=" + path + 575 + ">Sonia Nevermind: Hada</a></td>" +
+									"<td><a href=" + path + 000 + ">Disponible: Hada</a></td>" +
 									"<td><a href=" + path + 570 + ">Miranda L.: Volador</a></td>" +
 									"<td><a href=" + path + 633 + ">davidness: Fantasma</a></td>" +
 								"</tr>" +
 								"<tr>" +
 									"<td><a href=" + path + 539 + ">Sidaaaaa: Tierra</a></td>" +
-									"<td><a href=" + path + 000 + ">Disponible: Siniestro</a></td>" +
-									"<td><a href=" + path + 532 + ">Smorales: Veneno</a></td>" +
+									"<td><a href=" + path + 647 + "knight of war: Siniestro</a></td>" +
+									"<td><a href=" + path + 000 + ">Disponible: Veneno</a></td>" +
 								"</tr>" +
 								"<tr>" +
-									"<td><a href=" + path + 588 + ">FC Juanxzs: Fuego</a></td>" +
-									"<td><a href=" + path + 583 + ">PokeDramaFan: Eléctrico</a></td>" +
-									"<td><a href=" + path + 582 + ">FuruyaJCaos: Dragón</a></td>" +
+									"<td><a href=" + path + 000 + ">Disponible: Fuego</a></td>" +
+									"<td><a href=" + path + 000 + ">Disponible: Eléctrico</a></td>" +
+									"<td><a href=" + path + 000 + ">Disponible: Dragón</a></td>" +
 								"</tr>" +
 							"</table>" +
 					"</div>" +
