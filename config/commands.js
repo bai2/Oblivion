@@ -305,7 +305,7 @@ var commands = exports.commands = {
 								"</tr>" +
 								"<tr>" +
 									"<td><a href=" + path + 000 + ">Disponible: Fuego</a></td>" +
-									"<td><a href=" + path + 000 + ">Disponible: Eléctrico</a></td>" +
+									"<td><a href=" + path + 000 + ">Kruzes: Eléctrico</a></td>" +
 									"<td><a href=" + path + 000 + ">Disponible: Dragón</a></td>" +
 								"</tr>" +
 							"</table>" +
