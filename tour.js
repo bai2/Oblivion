@@ -424,7 +424,7 @@ var cmds = {
 		tour[rid].status = 1;
 		tour[rid].players = new Array();
 
-		Rooms.rooms[rid].addRaw('<hr /><h2><img src="http://s8.postimg.org/h46j3hahh/logohispano.png" align="center" width="160" height="120"><font color="SteelBlue">' + Tools.escapeHTML(user.name) + ' ha iniciado un torneo de tier ' + Tools.data.Formats[tempTourTier].name + '. Si deseas unirte digita </font> <font color="red">/j</font> <font color="steelblue">.</font></h2><b><font color="blueviolet">Jugadores:</font></b> ' + targets[1] + '<br /><font color="RoyalBlue"><b>FORMATO:</b></font> ' + Tools.data.Formats[tempTourTier].name + '<hr /><br /><font color="red"><b>Recuerda que debes mantener tu nombre durante todo el torneo.</b></font>');
+		Rooms.rooms[rid].addRaw('<hr /><h2><center><img src="http://s8.postimg.org/h46j3hahh/logohispano.png" width="230" /></center><font color="SteelBlue">' + Tools.escapeHTML(user.name) + ' ha iniciado un torneo de tier ' + Tools.data.Formats[tempTourTier].name + '. Si deseas unirte digita </font> <font color="red">/j</font> <font color="steelblue">.</font></h2><b><font color="blueviolet">Jugadores:</font></b> ' + targets[1] + '<br /><font color="RoyalBlue"><b>FORMATO:</b></font> ' + Tools.data.Formats[tempTourTier].name + '<hr /><br /><font color="red"><b>Recuerda que debes mantener tu nombre durante todo el torneo.</b></font>');
 		if (tour.timers[rid]) Rooms.rooms[rid].addRaw('<i>El torneo empezara en ' + tour.timers[rid].time + ' minuto' + (tour.timers[rid].time == 1 ? '' : 's') + '.<i>');
 	},
 
