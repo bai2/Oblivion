@@ -47,8 +47,7 @@ var jsHintOptions = {
 		"battleEngineFakeProcess": false,
 		"battleProtoCache": false,
 		"reloadCustomAvatars": false,
-		"Spamroom": false,
-		"Clans": false
+		"Spamroom": false
 	}
 };
 
