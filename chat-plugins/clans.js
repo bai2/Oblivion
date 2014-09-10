@@ -229,7 +229,7 @@ var War = exports.War = (function () {
 		this.score = 0; // Positive: clanA winning; Negative: clanB winning
 
 		this.room.add('|raw|' +
-			"<strong>A clan war between  " + Tools.escapeHTML(this.clanA.title) + " and " + Tools.escapeHTML(this.clanB.title) + ' has started!</strong><br />' +
+			"<strong>A clan war between  " + Tools.escapeHTML(this.clanA.title) + " and " + Tools.escapeHTML(this.clanB.title) + " has started!</strong><br />" +
 			this.getMatchups().map(function (matchup) {
 				return '<strong>' + Tools.escapeHTML(matchup.from) + "</strong> vs <strong>" + Tools.escapeHTML(matchup.to);
 			}).join('<br />')
@@ -292,7 +292,7 @@ var getClans = exports.getClans = function () {
 };
 var getClan = exports.get = function (name) {
 	var room = Rooms.get(toId(name));
-	return room instanceof ClanRoom ? room : null;
+	return room && room.isClanRoom ? room : null;
 };
 var getClansFromMember = exports.getFromMember = function (user) {
 	var results = [];
@@ -404,11 +404,12 @@ exports.commands = {
 			var rating = clan.getRating();
 			this.sendReplyBox(
 				'<h1>' + Tools.escapeHTML(clan.title) + '</h1>' +
-				clan.introMessage || '' +
+				(clan.introMessage || '') +
 				'<hr />' +
 				"<strong>Rating:</strong> " + rating.rating + " (" + rating.ratingName + ")<br />" +
 				"<strong>Wins/Losses/Draws:</strong> " + rating.wins + "/" + rating.losses + "/" + rating.draws + '<br />' +
-				"<strong>Members:</strong> " + Tools.escapeHTML(Object.keys(clan.auth || {}).sort().join(", "))
+				"<strong>Members:</strong> " + Tools.escapeHTML(Object.keys(clan.auth || {}).sort().join(", ")) + '<br />' +
+				"<button name=\"joinRoom\" value=\"" + clan.id + "\">Join</button>"
 			);
 		}
 	},
@@ -434,14 +435,14 @@ exports.commands = {
 	},
 
 	waravailable: function (target, room, user) {
-		if (!(room instanceof ClanRoom)) return this.sendReply("This is not a clan room.");
+		if (!room.isClanRoom) return this.sendReply("This is not a clan room.");
 		var expiryTime = room.setMemberAvailable(user);
 		if (!expiryTime) return this.sendReply("You are not a member of this clan.");
 		this.sendReply("You have been marked available for this clan's wars for " + (expiryTime - Date.now()).duration() + ".");
 	},
 
 	challenge: function (target, room) {
-		if (!(room instanceof ClanRoom)) return this.sendReply("This is not a clan room.");
+		if (!room.isClanRoom) return this.sendReply("This is not a clan room.");
 		if (!this.can('clans', room)) return;
 		if (room.currentWar) return this.sendReply("You are already at war.");
 
@@ -453,7 +454,7 @@ exports.commands = {
 	},
 
 	cancelchallenge: function (target, room) {
-		if (!(room instanceof ClanRoom)) return this.sendReply("This is not a clan room.");
+		if (!room.isClanRoom) return this.sendReply("This is not a clan room.");
 		if (!this.can('clans', room)) return;
 		if (!room.challengeTo) return this.sendReply("This clan isn't currently challenging anyone.");
 
@@ -461,7 +462,7 @@ exports.commands = {
 	},
 
 	accept: function (target, room) {
-		if (!(room instanceof ClanRoom)) return this.sendReply("This is not a clan room.");
+		if (!room.isClanRoom) return this.sendReply("This is not a clan room.");
 		if (!this.can('clans', room)) return;
 		if (room.currentWar) return this.sendReply("You are already at war.");
 
@@ -473,7 +474,7 @@ exports.commands = {
 	},
 
 	reject: function (target, room) {
-		if (!(room instanceof ClanRoom)) return this.sendReply("This is not a clan room.");
+		if (!room.isClanRoom) return this.sendReply("This is not a clan room.");
 		if (!this.can('clans', room)) return;
 
 		var otherClan = getClan(target);
@@ -483,7 +484,7 @@ exports.commands = {
 	},
 
 	endwar: function (target, room) {
-		if (!(room instanceof ClanRoom)) return this.sendReply("This is not a clan room.");
+		if (!room.isClanRoom) return this.sendReply("This is not a clan room.");
 		if (!this.can('clans', room)) return;
 		if (!room.currentWar) return this.sendReply("This clan currently isn't at war.");
 		if (room.currentWar.room !== room) return this.sendReply("This room is not hosting a war.");
@@ -494,7 +495,7 @@ exports.commands = {
 
 	matchups: function (target, room) {
 		if (!this.canBroadcast()) return;
-		if (!(room instanceof ClanRoom)) return this.sendReply("This is not a clan room.");
+		if (!room.isClanRoom) return this.sendReply("This is not a clan room.");
 		if (!room.currentWar) return this.sendReply("This clan currently isn't at war.");
 
 		this.sendReplyBox(
