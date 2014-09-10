@@ -182,7 +182,6 @@ var ClanRoom = exports.ClanRoom = (function () {
 		this.add("||" + clanA.title + " has " + (["lost", "won"][score] || "drawn") + " the clan war against " + clanB.title + ".");
 		this.add("|raw|<strong>" + Tools.escapeHTML(clanA.title) + ":</strong> " + oldRatingA + " &rarr; " + clanA.ratingData.rating + " (" + ratingToName(clanA.ratingData.rating) + ")");
 		this.add("|raw|<strong>" + Tools.escapeHTML(clanB.title) + ":</strong> " + oldRatingB + " &rarr; " + clanB.ratingData.rating + " (" + ratingToName(clanB.ratingData.rating) + ")");
-
 		this.update();
 
 		clanA.endCurrentWar();
@@ -418,7 +417,8 @@ exports.commands = {
 						'<hr />' +
 						"<strong>Rating:</strong> " + rating.rating + " (" + rating.ratingName + ")<br />" +
 						"<strong>Wins/Losses/Draws:</strong> " + rating.wins + "/" + rating.losses + "/" + rating.draws + '<br />' +
-						"<strong>Members:</strong> " + Tools.escapeHTML(Object.keys(clan.auth || {}).sort().join(", ")) +
+						"<strong>Members:</strong> " + Tools.escapeHTML(Object.keys(clan.auth || {}).sort().join(", ")) + '<br />' +
+						"<button name=\"joinRoom\" value=\"" + clan.id + "\">Join</button>" +
 					"</div>" +
 					"<img src=\"http://i.imgur.com/qFllIAe.png\" />" +
 				"</center>"
