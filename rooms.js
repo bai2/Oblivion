@@ -38,6 +38,7 @@ var Room = (function () {
 	Room.prototype.lastUpdate = 0;
 	Room.prototype.log = null;
 	Room.prototype.users = null;
+	Room.prototype.userCount = 0;
 
 	Room.prototype.send = function (message, errorArgument) {
 		if (errorArgument) throw new Error("Use Room#sendUser");
@@ -100,7 +101,6 @@ var GlobalRoom = (function () {
 		this.id = roomid;
 
 		// init battle rooms
-		this.rooms = [];
 		this.battleCount = 0;
 		this.searchers = [];
 
@@ -236,7 +236,7 @@ var GlobalRoom = (function () {
 		}
 		LoginServer.request('updateuserstats', {
 			date: Date.now(),
-			users: Object.size(this.users)
+			users: this.userCount
 		}, function () {});
 	};
 
@@ -265,9 +265,9 @@ var GlobalRoom = (function () {
 	GlobalRoom.prototype.getRoomList = function (filter) {
 		var roomList = {};
 		var total = 0;
-		for (var i = this.rooms.length - 1; i >= 0; i--) {
-			var room = this.rooms[i];
-			if (!room || !room.active) continue;
+		for (var i in Rooms.rooms) {
+			var room = Rooms.rooms[i];
+			if (!room || !room.active || room.isPrivate) continue;
 			if (filter && filter !== room.format && filter !== true) continue;
 			var roomData = {};
 			if (room.active && room.battle) {
@@ -278,7 +278,7 @@ var GlobalRoom = (function () {
 			roomList[room.id] = roomData;
 
 			total++;
-			if (total >= 6 && !filter) break;
+			if (total >= 100) break;
 		}
 		return roomList;
 	};
@@ -291,7 +291,7 @@ var GlobalRoom = (function () {
 			(room.isOfficial ? roomsData.official : roomsData.chat).push({
 				title: room.title,
 				desc: room.desc,
-				userCount: Object.size(room.users)
+				userCount: room.userCount
 			});
 		}
 		return roomsData;
@@ -409,9 +409,6 @@ var GlobalRoom = (function () {
 				user.sendTo(this, message);
 			}
 		}
-	};
-	GlobalRoom.prototype.updateRooms = function (excludeUser) {
-		// do nothing
 	};
 	GlobalRoom.prototype.add = function (message) {
 		if (rooms.lobby) rooms.lobby.add(message);
@@ -572,17 +569,9 @@ var GlobalRoom = (function () {
 	};
 	GlobalRoom.prototype.addRoom = function (room, format, p1, p2, parent, rated) {
 		room = Rooms.createBattle(room, format, p1, p2, parent, rated);
-		this.rooms.push(room);
 		return room;
 	};
-	GlobalRoom.prototype.removeRoom = function (room) {
-		room = getRoom(room);
-		if (!room) return;
-		var index = this.rooms.indexOf(room);
-		if (index >= 0) {
-			this.rooms.splice(index, 1);
-		}
-	};
+	GlobalRoom.prototype.removeRoom = function (room) {};
 	GlobalRoom.prototype.chat = function (user, message, connection) {
 		if (rooms.lobby) return rooms.lobby.chat(user, message, connection);
 		message = CommandParser.parse(message, this, user, connection);
@@ -922,10 +911,6 @@ var BattleRoom = (function () {
 
 		this.forfeit(this.battle.getPlayer(inactiveSide), ' lost due to inactivity.', inactiveSide);
 		this.resetUser = '';
-
-		if (this.parentid) {
-			getRoom(this.parentid).updateRooms();
-		}
 	};
 	BattleRoom.prototype.requestKickInactive = function (user, force) {
 		if (this.resetTimer) {
@@ -1047,9 +1032,6 @@ var BattleRoom = (function () {
 		if (this.active !== this.battle.active) {
 			rooms.global.battleCount += (this.battle.active ? 1 : 0) - (this.active ? 1 : 0);
 			this.active = this.battle.active;
-			if (this.parentid) {
-				getRoom(this.parentid).updateRooms();
-			}
 		}
 		this.update();
 	};
@@ -1072,6 +1054,7 @@ var BattleRoom = (function () {
 		}
 
 		this.users[user.userid] = user;
+		this.userCount++;
 
 		this.sendUser(connection, '|init|battle\n|title|' + this.title + '\n' + this.getLogForUser(user).join('\n'));
 		return user;
@@ -1108,14 +1091,12 @@ var BattleRoom = (function () {
 			this.battle.leave(user);
 			rooms.global.battleCount += (this.battle.active ? 1 : 0) - (this.active ? 1 : 0);
 			this.active = this.battle.active;
-			if (this.parentid) {
-				getRoom(this.parentid).updateRooms();
-			}
 		} else if (!user.named) {
 			delete this.users[user.userid];
 			return;
 		}
 		delete this.users[user.userid];
+		this.userCount--;
 		this.add('|leave|' + user.name);
 
 		if (Object.isEmpty(this.users)) {
@@ -1154,10 +1135,6 @@ var BattleRoom = (function () {
 		}
 		this.update();
 		this.kickInactiveUpdate();
-
-		if (this.parentid) {
-			getRoom(this.parentid).updateRooms();
-		}
 	};
 	BattleRoom.prototype.leaveBattle = function (user) {
 		if (!user) return false; // ...
@@ -1171,10 +1148,6 @@ var BattleRoom = (function () {
 		this.active = this.battle.active;
 		this.update();
 		this.kickInactiveUpdate();
-
-		if (this.parentid) {
-			getRoom(this.parentid).updateRooms();
-		}
 		return true;
 	};
 	BattleRoom.prototype.expire = function () {
@@ -1407,6 +1380,7 @@ var ChatRoom = (function () {
 		}
 
 		this.users[user.userid] = user;
+		this.userCount++;
 
 		if (!merging) {
 			var userList = this.userList ? this.userList : this.getUserList();
@@ -1466,7 +1440,10 @@ var ChatRoom = (function () {
 	};
 	ChatRoom.prototype.onLeave = function (user) {
 		if (!user) return; // ...
+
 		delete this.users[user.userid];
+		this.userCount--;
+
 		if (user.named && Config.reportJoins) {
 			this.add('|l|' + user.getIdentity(this.id));
 		} else if (user.named) {
