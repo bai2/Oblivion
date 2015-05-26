@@ -97,7 +97,7 @@ var core = exports.core = {
             return shop;
         }
 
-		var shopName = '<center><img src="http://i.imgur.com/xA7ruKZ.png" /><div class="shop">';
+		var shopName = '<center><div class="shop">';
 		
 		var s = shopName;
         s += '<table border="0" cellspacing="0" cellpadding="5" width="100%"><tbody><tr><th>Nombre</th><th>Descripción</th><th>Precio</th></tr>';
@@ -106,7 +106,7 @@ var core = exports.core = {
             s = s + '<tr><td><button name="send" value="/buy ' + shop[start][0] + '">' + shop[start][0] + '</button></td><td>' + shop[start][1] + '</td><td>' + shop[start][2] + '</td></tr>';
             start++;
         }
-        s += '</tbody></table><br /><center>Para comprar un producto de la tienda, usa el comando /buy [nombre].</center><br /></div><img src="http://i.imgur.com/fyLaZTn.png" /></center>';
+        s += '</tbody></table><br /><center>Para comprar un producto de la tienda, usa el comando /buy [nombre].</center><br /></div></center>';
         return s;
     },
 };

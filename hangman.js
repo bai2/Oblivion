@@ -1,240 +1,232 @@
-//There are a few things you'll need to add if you want to use this file. You need to change the makechatroom command so
-//that it resets the hangman status upon making a chatroom; otherwise trying to run hangman in the new room will crash
+//There are a few things you'll need to add if you want to use this file. You need to change the makechatroom command so 
+//that it resets the hangman status upon making a chatroom; otherwise trying to run hangman in the new room will crash 
 //the server. Specifically, you'll need to add "hangman.reset(id)" somewhere in the code. Have fun! - piiiikachuuu
 
 exports.hangman = function(h) {
-	if (typeof h != "undefined") var hangman = h; else var hangman = new Object();
-	var hangmanFunctions = {
-		//reset hangman in the room - used once a round ends.
-		reset: function(rid) {
-			hangman[rid] = {
-				givenguesses: 8,
-				hangman: false,
-				guessword: new Array(),
-				hangmaner: new Array(),
-				guessletters: new Array(),
-				guessedletters: new Array(),
-				guessedwords: new Array(),
-				correctletters: new Array(),
-				spaces: new Array(),
-				hangmantopic: new Array(),
-			};
-		}
-	};
-	for (var i in hangmanFunctions) {
-		hangman[i] = hangmanFunctions[i];
-	}
-	for (var i in Rooms.rooms) {
-		if (Rooms.rooms[i].type == "chat" && !hangman[i]) {
-			hangman[i] = new Object();
-			hangman.reset(i);
-		}
-	}
-	return hangman;
+    if (typeof h != "undefined") var hangman = h;
+    else var hangman = new Object();
+    var hangmanFunctions = {
+        //reset hangman in the room - used once a round ends.
+        reset: function(rid) {
+            hangman[rid] = {
+                givenguesses: 12,
+                hangman: false,
+                guessword: new Array(),
+                hangmaner: new Array(),
+                guessletters: new Array(),
+                guessedletters: new Array(),
+                guessedwords: new Array(),
+                correctletters: new Array(),
+                spaces: new Array(),
+                hangmantopic: new Array(),
+            };
+        }
+    };
+    for (var i in hangmanFunctions) {
+        hangman[i] = hangmanFunctions[i];
+    }
+    for (var i in Rooms.rooms) {
+        if (Rooms.rooms[i].type == "chat" && !hangman[i]) {
+            hangman[i] = new Object();
+            hangman.reset(i);
+        }
+    }
+    return hangman;
 };
 
 var cmds = {
-	hangmanhelp: function(target, room, user) {
-		if (!this.canBroadcast()) return;
-		this.sendReplyBox('<font size = 2>Una pequeña introducción al </font><font size = 3>Hangman:</font><br />' +
-						'El clásico juego, la idea básica del hangman es adivinar la palabra en la que alguien esta pensando antes de que el hombre sea "ahorcado". Los jugadores tienen 8 oportunidades antes de que esto pase<br />' +
-						'Los juegos pueden ser iniciados por Voice o rangos superiores incluyendo Room Voice, Room Mod, y Room Owner.<br />' +
-						'Los comandos son:<br />' +
-						'<ul><li>/hangman [palabra], [descripción] - Inicia el juego de hangman con la palabra especificada sobre un tema en específico Requiere: + % @ & ~</li>' +
-						'<li>/guess [letter] - Adivina una letra.</li>' +
-						'<li>/guessword [word] - Adivina una palabra.</li>' +
-						'<li>/viewhangman - Muestra el estado actual del juego. Puede ser voceado.</li>' +
-						'<li>/word - Permite a la persona que inició el juego ver la palabra.</li>' +
-						'<li>/category [descripción] OR /topic [descripción] - Permite a la persona que inició el juego cambiar la descripción.</li>' +
-						'<li>/endhangman - Finaliza el juego de hangman. Requiere: + % @ & ~</li></ul>' +
-						'Debido a cambios recientes, hangman puede ser jugado en múltiples chatrooms (exceptuando el lobby por ser muy grande).<br />' +
-						'Diviertete y siéntete libre de mandar un MP si encuentras un bug en el juego - Sweetie');
-	},
+    hh: 'hangmanhelp',
+    hangmanhelp: function(target, room, user) {
+        if (!this.canBroadcast()) return;
+        this.sendReplyBox(
+            '<font size = 2>A brief introduction to </font><font size = 3>Hangman:</font><br />' +
+            'The classic game, the basic idea of hangman is to guess the word that someone is thinking of before the man is "hanged." Players are given 12 guesses before this happens.<br />' +
+            'Games can be started by anyone of the rank Voice or higher, including Room Voice, Room Mod, and Room Owner.<br />' +
+            'The commands are:<br />' +
+            '<ul><li>/hangman (/hangman) [word], [description] - Starts the game of hangman, with a specified word and a general category. Requires: + % @ & ~</li>' +
+            '<li>/guess (/g) [letter] - Guesses a letter.</li>' +
+            '<li>/guessword (/gw) [word] - Guesses a word.</li>' +
+            '<li>/viewhangman (/vh) - Shows the current status of hangman. Can be broadcasted.</li>' +
+            '<li>/word - Allows the person running hangman to view the word.</li>' +
+            '<li>/category [description] OR /topic [description] - Allows the person running hangman to changed the topic.</li>' +
+            '<li>/endhangman (/eh) - Ends the game of hangman in the room. Requires: + % @ & ~</li></ul>' +
+            'Have fun, and feel free to PM me if you find any bugs! - panpawn'
+        );
+    },
 
-	hangman: function(target, room, user) {
-		if (target == "update" && this.can('hotpatch')) {
-			CommandParser.uncacheTree('./hangman.js');
-			hangman = require('./hangman.js').hangman(hangman);
-			return this.sendReply('Los scripts de hangman fueron actualizados.');
-		}
-		if (target == "update" && !this.can('hotpatch')) {
-			return this.sendReply('No puedes actualizar los scripts de hangman.');
-		}
-		if (!user.can('broadcast', room)) {
-			return this.sendReply('No tienes la suficiente autoridad para hacer esto.');
-		}
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor, intenta jugar en otra sala, es muy grande para el lobby');
-		}
-		if(hangman[room.id].hangman === true) {
-			return this.sendReply('Hay un juego de hangman en curso');
-		}
-		if(!target) {
-			return this.sendReply('La forma correcta del comando es /hangman [palabra], [descripción].');
-		}
-		if(room.type === 'battle') {
-			return this.sendReply('You cannot start this in a battle room.');
-		}
-		if(hangman[room.id].hangman === false) {
-			var targets = target.split(',');
-			if(!targets[1]) {
-				return this.sendReply('Asegurate de incluir la descripción');
-			}
-			if(targets[0].length > 10) {
-				return this.sendReply('Como solo se permite intentar en 8 ocasiones, la palabra no puede ser mayor a 10 letras.')
-			}
-			if(targets[0].indexOf(' ') != -1) {
-				return this.sendReply('Por favor no uses espacios en la palabra a adivinar.');
-			}
-			hangman.reset(room.id);
-			hangman[room.id].hangman = true;
-			var targetword = targets[0].toLowerCase();
-			hangman[room.id].guessword.push(targetword);
-			hangman[room.id].hangmaner.push(user.userid);
-			for(var i = 0; i < targets[0].length; i++) {
-				hangman[room.id].guessletters.push(targetword[i]);
-				hangman[room.id].spaces.push('_');
-				hangman[room.id].hangmantopic[0] = targets[1];
-			}
-			return this.add('|html|<div class = "infobox"><div class = "broadcast-green"><center><font size = 2><b>' + user.name + '</b> ha iniciado un juego de ahorcado. La palabra tiene ' + targets[0].length + ' letras.<br>' + hangman[room.id].spaces.join(" ") + '<br>La categoría: ' + hangman[room.id].hangmantopic[0] + '</font></center></div></div>');
-		}
-	},
+    hang: 'hangman',
+    hangman: function(target, room, user) {
+        if (target == "update" && this.can('hotpatch')) {
+            CommandParser.uncacheTree('./hangman.js');
+            hangman = require('./hangman.js').hangman(hangman);
+            return this.sendReply('Hangman scripts were updated.');
+        }
+        if (target == "update" && !this.can('hotpatch')) {
+            return this.sendReply('You cannot update hangman scripts.');
+        }
+        if (!user.can('broadcast', null, room)) {
+            return this.sendReply('You do not have enough authority to do this.');
+        }
+        if (hangman[room.id].hangman === true) {
+            return this.sendReply('There is already a game of hangman going on.');
+        }
+        if (!target) {
+            return this.sendReply('The correct syntax for this command is /hangman [word], [topic]');
+        }
+        if (hangman[room.id].hangman === false) {
+            var targets = target.split(',');
+            if (!targets[1]) {
+                return this.sendReply('Make sure you include a topic.');
+            }
+            if (targets[0].length > 10) {
+                return this.sendReply('Seeing as there are only 12 given guesses, don\'t make the word too long.')
+            }
+            if (targets[0].indexOf(' ') != -1) {
+                return this.sendReply('Please don\'t put spaces in the word.');
+            }
+            if (targets[1].indexOf('<img ', '<a href', '<font ', '<marquee', '<blink', '<center', '<button', '<b', '<i') != -1) {
+                return this.sendReply('Ha, ha, ha... Thinking HTML works here... HA!');
+            }
+            hangman.reset(room.id);
+            hangman[room.id].hangman = true;
+            var targetword = targets[0].toLowerCase();
+            hangman[room.id].guessword.push(targetword);
+            hangman[room.id].hangmaner.push(user.userid);
+            for (var i = 0; i < targets[0].length; i++) {
+                hangman[room.id].guessletters.push(targetword[i]);
+                hangman[room.id].spaces.push('_');
+                hangman[room.id].hangmantopic[0] = targets[1];
+            }
+            return this.add('|html|<div class = "infobox"><div class = "broadcast-green"><center><font size = 2><b>' + user.name + '</b> started a game of hangman! The word has ' + targets[0].length + ' letters.<br>' + hangman[room.id].spaces.join(" ") + '<br>The category: ' + hangman[room.id].hangmantopic[0] + '</font></center></div></div>');
+        }
+    },
 
-	viewhangman: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
-		if (!this.canBroadcast()) return;
-		if(hangman[room.id].hangman === false) {
-			return this.sendReply('No hay juego de hangman en curso.');
-		}
-		this.sendReplyBox('|html|<div class = "broadcast-green"><center><font size = 2>' + hangman[room.id].spaces.join(" ") + '<br>Intentos restantes: ' + hangman[room.id].givenguesses + '<br>Categoría: ' + hangman[room.id].hangmantopic[0] + '</font>');
-	},
+    vh: 'viewhangman',
+    viewhangman: function(target, room, user) {
+        if (!this.canBroadcast()) return;
+        if (hangman[room.id].hangman === false) {
+            return this.sendReply('There is no game of hangman going on right now.');
+        }
+        this.sendReplyBox('<div class = "infobox"><div class = "broadcast-blue"><font size = 2 font color="black">' + hangman[room.id].spaces.join(" ") + '<br>Guesses left: ' + hangman[room.id].givenguesses + '<br>Category: ' + hangman[room.id].hangmantopic[0] + '</font>');
+    },
 
-	 topic: 'category',
-	 category: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
-		if(hangman === false) {
-			return this.sendReply('No hay juego de hangman en curso.');
-		}
-		if(user.userid != hangman[room.id].hangmaner[0]) {
-			return this.sendReply('No puedes cambiar la categoría debido a que no hay juego en curso.');
-		}
-		hangman[room.id].hangmantopic[0] = target;
-		return this.sendReply('Cambiaste la categoría a \'' + target + '\'.');
-	},
+    topic: 'category',
+    category: function(target, room, user) {
+        if (hangman === false) {
+            return this.sendReply('There is no game of hangman going on right now.');
+        }
+        if (user.userid != hangmaner[0]) {
+            return this.sendReply('You cannot change the category because you are not running hangman.');
+        }
+        hangman[room.id].hangmantopic[0] = target;
+        return this.sendReply('You set the category of hangman to \'' + target + '\'.');
+    },
 
+    word: function(target, room, user) {
+        if (user.userid === hangman[room.id].hangmaner[0]) {
+            return this.sendReply('Your word is \'' + hangman[room.id].guessword[0] + '\'.');
+        } else {
+            return this.sendReply('You are not the person who started this hangman.');
+        }
+    },
+    gl: 'guess',
+    g: 'guess',
+    guess: function(target, room, user) {
+        if (!this.canTalk()) return;
+        if (hangman[room.id].hangman === false) {
+            return this.sendReply('There is no game of hangman going on.');
+        }
+        if (user.userid === hangman[room.id].hangmaner[0]) {
+            return this.sendReply('You cannot guess because you are running hangman!');
+        }
+        if (!target) {
+            return this.sendReply('Please specify a letter to guess.');
+        }
+        if (target.length > 1) {
+            return this.sendReply('Please specify a single letter to guess. To guess the word, use /guessword.');
+        }
+        lettertarget = target.toLowerCase();
+        for (var y = 0; y < 27; y++) {
+            if (lettertarget === hangman[room.id].guessedletters[y]) {
+                return this.sendReply('Someone has already guessed the letter \'' + lettertarget + '\'.');
+            }
+        }
+        var letterright = new Array();
+        for (var a = 0; a < hangman[room.id].guessword[0].length; a++) {
+            if (lettertarget === hangman[room.id].guessletters[a]) {
+                var c = a + 1;
+                letterright.push(c);
+                hangman[room.id].correctletters.push(c);
+                hangman[room.id].spaces[a] = lettertarget;
+            }
+        }
+        if (letterright[0] === undefined) {
+            hangman[room.id].givenguesses = hangman[room.id].givenguesses - 1;
+            if (hangman[room.id].givenguesses === 0) {
+                hangman.reset(room.id);
+                return this.add('|html|<b>' + user.name + '</b> guessed the letter \'' + lettertarget + '\', but it was not in the word. You have failed to guess the word, so the man has been hanged.');
+            }
+            this.add('|html|<b>' + user.name + '</b> guessed the letter \'' + lettertarget + '\', but it was not in the word.');
+        } else {
+            this.add('|html|<b>' + user.name + '</b> guessed the letter \'' + lettertarget + '\', which was letter(s) ' + letterright.toString() + ' of the word.');
+        }
+        hangman[room.id].guessedletters.push(lettertarget);
+        if (hangman[room.id].correctletters.length === hangman[room.id].guessword[0].length) {
+            this.add('|html|Congratulations! <b>' + user.name + '</b> has guessed the word, which was: \'' + hangman[room.id].guessword[0] + '\'.');
+            hangman.reset(room.id)
+        }
+    },
 
-	word: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
-		if(user.userid === hangman[room.id].hangmaner[0]) {
-			return this.sendReply('La palabra es \'' + hangman[room.id].guessword[0] + '\'.');
-		}
-		else {
-			return this.sendReply('No eres la persona que inició el juego.');
-		}
-	},
+    gw: 'guessword',
+    guessword: function(target, room, user) {
+        if (!this.canTalk()) return;
+        if (hangman[room.id].hangman === false) {
+            return this.sendReply('There is no game of hangman going on.');
+        }
+        if (target.length > hangman[room.id].guessword[0].length) {
+            var hangWordLength = hangman[room.id].guessword[0].length;
+            return this.sendReply('Your guess cannot be longer than the actual word, nub.  The word contains ' + hangWordLength + ' letters.');
+        }
+        if (!target) {
+            return this.sendReply('Please specify the word you are trying to guess.');
+        }
+        if (target.length > 25) {
+            return this.sendReply('This guess is too long; it cannot exceed 25 characters.');
+        }
+        if (user.userid === hangman[room.id].hangmaner[0]) {
+            return this.sendReply('You cannot guess the word because you are running hangman!');
+        }
+        var targetword = target.toLowerCase();
+        if (targetword === hangman[room.id].guessword[0]) {
+            this.add('|html|Congratulations! <b>' + user.name + '</b> has guessed the word, which was: \'' + hangman[room.id].guessword[0] + '\'.');
+            hangman.reset(room.id)
+        } else {
+            if (hangman[room.id].guessedwords.indexOf(target) != -1) {
+                return this.sendReply('Someone has already guessed this word.')
+            }
+            hangman[room.id].givenguesses = hangman[room.id].givenguesses - 1;
+            hangman[room.id].guessedwords.push(target);
+            if (hangman[room.id].givenguesses === 0) {
+                hangman.reset(room.id)
+                return this.add('|html|<b>' + user.name + '</b> guessed the word \'' + targetword + '\', but it was not the word. You have failed to guess the word, so the man has been hanged.');
+            }
+            this.add('|html|<b>' + user.name + '</b> guessed the word \'' + targetword + '\', but it was not the word.');
+        }
+    },
 
-	guess: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
-		if(hangman[room.id].hangman === false) {
-			return this.sendReply('No hay juego de hangman en curso.');
-		}
-		if(user.userid === hangman[room.id].hangmaner[0]) {
-			return this.sendReply('No puedes adivinar debido a que tu iniciaste el juego.');
-		}
-		if(!target) {
-			return this.sendReply('Por favor especifíca una letra para adivinar.');
-		}
-		if(target.length > 1) {
-			return this.sendReply('Por favor especifíca una letra para adivinar.  Para adivinar la palabra, usa /guessword.');
-		}
-		lettertarget = target.toLowerCase();
-		for(var y = 0; y < 27; y++) {
-			if(lettertarget === hangman[room.id].guessedletters[y]) {
-				return this.sendReply('Alguien ya adivinó la letra \'' + lettertarget + '\'.');
-			}
-		}
-		var letterright = new Array();
-		for(var a = 0; a < hangman[room.id].guessword[0].length; a++) {
-			if(lettertarget === hangman[room.id].guessletters[a]) {
-				var c = a + 1;
-				letterright.push(c);
-				hangman[room.id].correctletters.push(c);
-				hangman[room.id].spaces[a] = lettertarget;
-			}
-		}
-		if(letterright[0] === undefined) {
-			hangman[room.id].givenguesses = hangman[room.id].givenguesses - 1;
-				if(hangman[room.id].givenguesses === 0) {
-					hangman.reset(room.id);
-					return this.add('|html|<b>' + user.name + '</b> intentó la letra \'' + lettertarget + '\', pero no esta en la palabra. Han fallado en adivinar la palabra por lo que el hombre fue ahorcado.');
-				}
-			this.add('|html|<b>' + user.name + '</b> guessed the letter \'' + lettertarget + '\', pero no estaba en la palabra.');
-		}
-		else {
-			this.add('|html|<b>' + user.name + '</b> adivinó la letra \'' + lettertarget + '\', que era la letra(s) ' + letterright.toString() + ' de la palabra');
-		}
-		hangman[room.id].guessedletters.push(lettertarget);
-		if(hangman[room.id].correctletters.length === hangman[room.id].guessword[0].length) {
-			this.add('|html|Felicidades! <b>' + user.name + '</b> ha adivinado la palabra que era: \'' + hangman[room.id].guessword[0] + '\'.');
-			hangman.reset(room.id)
-		}
-	},
-
-	guessword: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
-		if(hangman[room.id].hangman === false) {
-			return this.sendReply('No hay juego de hangman en curso');
-		}
-		if(!target) {
-			return this.sendReply('Por favor especifíca la palabra que intentas adivinar');
-		}
-		if(user.userid === hangman[room.id].hangmaner[0]) {
-			return this.sendReply('No puedes adivinar debido a que tu iniciaste el juego.');
-		}
-		var targetword = target.toLowerCase();
-		if(targetword === hangman[room.id].guessword[0]) {
-			this.add('|html|Felicidades!! <b>' + user.name + '</b> ha adivinado la palabra, que era: \'' + hangman[room.id].guessword[0] + '\'.');
-			hangman.reset(room.id)
-		}
-		else {
-			if (hangman[room.id].guessedwords.indexOf(target) != -1) {
-				return this.sendReply('Alguien ya intentó adivinar esta palabra')
-			}
-			hangman[room.id].givenguesses = hangman[room.id].givenguesses - 1;
-			hangman[room.id].guessedwords.push(target);
-			if(hangman[room.id].givenguesses === 0) {
-				hangman.reset(room.id)
-				return this.add('|html|<b>' + user.name + '</b> intento la palabra \'' + targetword + '\', pero esta no era. Fallaron al adivinar la palabra por lo que el hombre fue ahorcado');
-			}
-			this.add('|html|<b>' + user.name + '</b> intentó la palabra \'' + targetword + '\', pero esta no era la correcta.');
-		}
-	},
-
-	endhangman: function(target, room, user) {
-		if(room.id === 'lobby') {
-				return this.sendReply('|html|Por favor juega en otra parte. Es muy grande para el lobby.');
-		}
-		if (!user.can('broadcast', room)) {
-			return this.sendReply('No tienes suficiente autoridad para hacer esto.');
-		}
-		if(hangman[room.id].hangman === false) {
-			return this.sendReply('No hay un juego de hangman en curso');
-		}
-		if(hangman[room.id].hangman === true) {
-			this.add('|html|<b>' + user.name + '</b> ha finalizado el juego de hangman');
-			hangman.reset(room.id);
-		}
-	}
+    eh: 'endhangman',
+    endhangman: function(target, room, user) {
+        if (!user.can('broadcast', null, room)) {
+            return this.sendReply('You do not have enough authority to do this.');
+        }
+        if (hangman[room.id].hangman === false) {
+            return this.sendReply('There is no game going on.');
+        }
+        if (hangman[room.id].hangman === true) {
+            this.add('|html|<b>' + user.name + '</b> ended the game of hangman.');
+            hangman.reset(room.id);
+        }
+    }
 };
 
 for (var i in cmds) CommandParser.commands[i] = cmds[i];

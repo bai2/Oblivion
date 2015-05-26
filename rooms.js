@@ -20,6 +20,8 @@ var Rooms = module.exports = getRoom;
 
 var rooms = Rooms.rooms = Object.create(null);
 
+var aliases = Object.create(null);
+
 var Room = (function () {
 	function Room(roomid, title) {
 		this.id = roomid;
@@ -143,6 +145,11 @@ var GlobalRoom = (function () {
 			var id = toId(this.chatRoomData[i].title);
 			console.log("NEW CHATROOM: " + id);
 			var room = Rooms.createChatRoom(id, this.chatRoomData[i].title, this.chatRoomData[i]);
+			if (room.aliases) {
+				for (var a = 0; a < room.aliases.length; a++) {
+					aliases[room.aliases[a]] = room;
+				}
+			}
 			this.chatRooms.push(room);
 			if (room.autojoin) this.autojoin.push(id);
 			if (room.staffAutojoin) this.staffAutojoin.push(id);
@@ -267,10 +274,15 @@ var GlobalRoom = (function () {
 	GlobalRoom.prototype.getRoomList = function (filter) {
 		var roomList = {};
 		var total = 0;
+		var skipCount = 0;
+		if (this.battleCount > 150) {
+			skipCount = this.battleCount - 150;
+		}
 		for (var i in Rooms.rooms) {
 			var room = Rooms.rooms[i];
 			if (!room || !room.active || room.isPrivate) continue;
 			if (filter && filter !== room.format && filter !== true) continue;
+			if (skipCount && skipCount--) continue;
 			var roomData = {};
 			if (room.active && room.battle) {
 				if (room.battle.players[0]) roomData.p1 = room.battle.players[0].getIdentity();
@@ -391,7 +403,7 @@ var GlobalRoom = (function () {
 				this.cancelSearch(user, true);
 				this.cancelSearch(searchUser, true);
 				user.send('|updatesearch|' + JSON.stringify({searching: false}));
-				this.startBattle(searchUser, user, search.formatid, true, search.team, newSearch.team);
+				this.startBattle(searchUser, user, search.formatid, search.team, newSearch.team, {rated: true});
 				return;
 			}
 		}
@@ -481,9 +493,18 @@ var GlobalRoom = (function () {
 		}
 	};
 	GlobalRoom.prototype.checkAutojoin = function (user, connection) {
-		if (user.can('staff')) {
-			for (var i = 0; i < this.staffAutojoin.length; i++) {
-				user.joinRoom(this.staffAutojoin[i], connection);
+		for (var i = 0; i < this.staffAutojoin.length; i++) {
+			var room = Rooms.get(this.staffAutojoin[i]);
+			if (!room) {
+				this.staffAutojoin.splice(i, 1);
+				i--;
+				continue;
+			}
+			if (room.staffAutojoin === true && user.can('staff') ||
+					typeof room.staffAutojoin === 'string' && room.staffAutojoin.indexOf(user.group) >= 0) {
+				// if staffAutojoin is true: autojoin if isStaff
+				// if staffAutojoin is String: autojoin if user.group in staffAutojoin
+				user.joinRoom(room.id, connection);
 			}
 		}
 		if (user.can('hotpatch')) {
@@ -527,7 +548,7 @@ var GlobalRoom = (function () {
 		--this.userCount;
 		this.cancelSearch(user, true);
 	};
-	GlobalRoom.prototype.startBattle = function (p1, p2, format, rated, p1team, p2team) {
+	GlobalRoom.prototype.startBattle = function (p1, p2, format, p1team, p2team, options) {
 		var newRoom;
 		p1 = Users.get(p1);
 		p2 = Users.get(p2);
@@ -545,7 +566,7 @@ var GlobalRoom = (function () {
 			return;
 		}
 
-		if (this.lockdown) {
+		if (this.lockdown === true) {
 			this.cancelSearch(p1, true);
 			this.cancelSearch(p2, true);
 			p1.popup("The server is shutting down. Battles cannot be started at this time.");
@@ -556,12 +577,12 @@ var GlobalRoom = (function () {
 		//console.log('BATTLE START BETWEEN: ' + p1.userid + ' ' + p2.userid);
 		var i = this.lastBattle + 1;
 		var formaturlid = format.toLowerCase().replace(/[^a-z0-9]+/g, '');
-		while(rooms['battle-' + formaturlid + i]) {
+		while (rooms['battle-' + formaturlid + i]) {
 			i++;
 		}
 		this.lastBattle = i;
 		rooms.global.writeNumRooms();
-		newRoom = this.addRoom('battle-' + formaturlid + '-' + i, format, p1, p2, this.id, rated);
+		newRoom = this.addRoom('battle-' + formaturlid + '-' + i, format, p1, p2, options);
 		p1.joinRoom(newRoom);
 		p2.joinRoom(newRoom);
 		newRoom.joinBattle(p1, p1team);
@@ -571,20 +592,19 @@ var GlobalRoom = (function () {
 		if (Config.reportBattles && rooms.lobby) {
 			rooms.lobby.add('|b|' + newRoom.id + '|' + p1.getIdentity() + '|' + p2.getIdentity());
 		}
-		if (Config.logladderip && rated) {
+		if (Config.logladderip && options.rated) {
 			if (!this.ladderIpLog) {
 				this.ladderIpLog = fs.createWriteStream('logs/ladderip/ladderip.txt', {flags: 'a'});
 			}
-			this.ladderIpLog.write(p1.userid+': '+p1.latestIp+'\n');
-			this.ladderIpLog.write(p2.userid+': '+p2.latestIp+'\n');
+			this.ladderIpLog.write(p1.userid + ': ' + p1.latestIp + '\n');
+			this.ladderIpLog.write(p2.userid + ': ' + p2.latestIp + '\n');
 		}
 		return newRoom;
 	};
-	GlobalRoom.prototype.addRoom = function (room, format, p1, p2, parent, rated) {
-		room = Rooms.createBattle(room, format, p1, p2, parent, rated);
+	GlobalRoom.prototype.addRoom = function (room, format, p1, p2, options) {
+		room = Rooms.createBattle(room, format, p1, p2, options);
 		return room;
 	};
-	GlobalRoom.prototype.removeRoom = function (room) {};
 	GlobalRoom.prototype.chat = function (user, message, connection) {
 		if (rooms.lobby) return rooms.lobby.chat(user, message, connection);
 		message = CommandParser.parse(message, this, user, connection);
@@ -596,7 +616,7 @@ var GlobalRoom = (function () {
 })();
 
 var BattleRoom = (function () {
-	function BattleRoom(roomid, format, p1, p2, parentid, rated) {
+	function BattleRoom(roomid, format, p1, p2, options) {
 		Room.call(this, roomid, "" + p1.name + " vs. " + p2.name);
 		this.modchat = (Config.modchat.battle || false);
 
@@ -608,7 +628,13 @@ var BattleRoom = (function () {
 
 		var formatid = toId(format);
 
-		if (rated && Tools.getFormat(formatid).rated !== false) {
+		// Sometimes we might allow BattleRooms to have no options
+		if (!options) {
+			options = {};
+		}
+
+		var rated;
+		if (options.rated && Tools.getFormat(formatid).rated !== false) {
 			rated = {
 				p1: p1.userid,
 				p2: p2.userid,
@@ -618,10 +644,20 @@ var BattleRoom = (function () {
 			rated = false;
 		}
 
+		if (options.tour) {
+			this.tour = {
+				p1: p1.userid,
+				p2: p2.userid,
+				format: format,
+				tour: options.tour
+			};
+		} else {
+			this.tour = false;
+		}
+
 		this.rated = rated;
 		this.battle = Simulator.create(this.id, format, rated, this);
 
-		this.parentid = parentid || '';
 		this.p1 = p1 || '';
 		this.p2 = p2 || '';
 
@@ -723,7 +759,7 @@ var BattleRoom = (function () {
 							Users.get(p1).cacheMMR(rated.format, data.p1rating);
 							Users.get(p2).cacheMMR(rated.format, data.p2rating);
 							self.update();
-						} catch(e) {
+						} catch (e) {
 							self.addRaw('There was an error calculating rating changes.');
 							self.update();
 						}
@@ -734,6 +770,12 @@ var BattleRoom = (function () {
 					}
 				});
 			}
+		}
+		if (this.tour) {
+			var winnerid = toId(winner);
+			winner = Users.get(winner);
+			var tour = this.tour.tour;
+			tour.onBattleWin(this, winner);
 		}
 		rooms.global.battleCount += 0 - (this.active ? 1 : 0);
 		this.active = false;
@@ -774,9 +816,8 @@ var BattleRoom = (function () {
 			break;
 		}
 		if (!hasUsers) {
-			if (!this.expireTimer) {
-				this.expireTimer = setTimeout(this.tryExpire.bind(this), TIMEOUT_EMPTY_DEALLOCATE);
-			}
+			if (this.expireTimer) clearTimeout(this.expireTimer);
+			this.expireTimer = setTimeout(this.tryExpire.bind(this), TIMEOUT_EMPTY_DEALLOCATE);
 		} else {
 			if (this.expireTimer) clearTimeout(this.expireTimer);
 			this.expireTimer = setTimeout(this.tryExpire.bind(this), TIMEOUT_INACTIVE_DEALLOCATE);
@@ -1110,6 +1151,17 @@ var BattleRoom = (function () {
 			}
 		}
 
+		if (this.tour) {
+			if (this.tour.p1 === user.userid) {
+				slot = 0;
+			} else if (this.tour.p2 === user.userid) {
+				slot = 1;
+			} else {
+				user.popup("This is a tournament battle; your username must be " + this.tour.p1 + " or " + this.tour.p2 + " to join.");
+				return false;
+			}
+		}
+
 		if (this.battle.active) {
 			user.popup("This battle already has two players.");
 			return false;
@@ -1154,8 +1206,6 @@ var BattleRoom = (function () {
 		}
 		this.users = null;
 
-		rooms.global.removeRoom(this.id);
-
 		// deallocate children and get rid of references to them
 		if (this.battle) {
 			this.battle.destroy();
@@ -1166,6 +1216,10 @@ var BattleRoom = (function () {
 			clearTimeout(this.resetTimer);
 		}
 		this.resetTimer = null;
+		if (this.expireTimer) {
+			clearTimeout(this.expireTimer);
+		}
+		this.expireTimer = null;
 
 		// get rid of some possibly-circular references
 		delete rooms[this.id];
@@ -1384,17 +1438,6 @@ var ChatRoom = (function () {
 	};
 	ChatRoom.prototype.onRename = function (user, oldid, joining) {
 		delete this.users[oldid];
-		if (this.bannedUsers && (user.userid in this.bannedUsers || user.autoconfirmed in this.bannedUsers)) {
-			this.bannedUsers[oldid] = true;
-			for (var ip in user.ips) this.bannedIps[ip] = true;
-			user.leaveRoom(this);
-			var alts = user.getAlts();
-			for (var i = 0; i < alts.length; ++i) {
-				this.bannedUsers[toId(alts[i])] = true;
-				Users.getExact(alts[i]).leaveRoom(this);
-			}
-			return;
-		}
 		this.users[user.userid] = user;
 		var entry;
 		if (joining) {
@@ -1412,6 +1455,17 @@ var ChatRoom = (function () {
 			this.add(entry);
 		} else {
 			this.reportJoin(entry);
+		}
+		if (this.bannedUsers && (user.userid in this.bannedUsers || user.autoconfirmed in this.bannedUsers)) {
+			this.bannedUsers[oldid] = true;
+			for (var ip in user.ips) this.bannedIps[ip] = true;
+			user.leaveRoom(this);
+			var alts = user.getAlts();
+			for (var i = 0; i < alts.length; ++i) {
+				this.bannedUsers[toId(alts[i])] = true;
+				Users.getExact(alts[i]).leaveRoom(this);
+			}
+			return;
 		}
 		if (global.Tournaments && Tournaments.get(this.id)) {
 			Tournaments.get(this.id).updateFor(user);
@@ -1470,8 +1524,11 @@ function getRoom(roomid, fallback) {
 	return rooms[roomid];
 }
 Rooms.get = getRoom;
+Rooms.search = function (name, fallback) {
+	return getRoom(name) || getRoom(toId(name)) || Rooms.aliases[toId(name)] || (fallback ? rooms.global : undefined);
+};
 
-Rooms.createBattle = function (roomid, format, p1, p2, parent, rated) {
+Rooms.createBattle = function (roomid, format, p1, p2, options) {
 	if (roomid && roomid.id) return roomid;
 	if (!p1 || !p2) return false;
 	if (!roomid) roomid = 'default';
@@ -1479,7 +1536,7 @@ Rooms.createBattle = function (roomid, format, p1, p2, parent, rated) {
 		// console.log("NEW BATTLE ROOM: " + roomid);
 		ResourceMonitor.countBattle(p1.latestIp, p1.name);
 		ResourceMonitor.countBattle(p2.latestIp, p2.name);
-		rooms[roomid] = new BattleRoom(roomid, format, p1, p2, parent, rated);
+		rooms[roomid] = new BattleRoom(roomid, format, p1, p2, options);
 	}
 	return rooms[roomid];
 };
@@ -1500,3 +1557,4 @@ Rooms.ChatRoom = ChatRoom;
 
 Rooms.global = rooms.global;
 Rooms.lobby = rooms.lobby;
+Rooms.aliases = aliases;

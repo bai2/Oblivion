@@ -110,7 +110,7 @@ function canTalk(user, room, connection, message) {
 		}
 
 		// remove zalgo
-		message = message.replace(/[\u0300-\u036f\u0483-\u0489\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]{3,}/g, '');
+		message = message.replace(/[\u0300-\u036f\u0483-\u0489\u064b-\u065f\u0670\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]{3,}/g, '');
 
 		if (room && room.id === 'lobby') {
 			var normalized = message.trim();
@@ -124,7 +124,7 @@ function canTalk(user, room, connection, message) {
 		}
 
 		if (Config.chatFilter) {
-			return Config.chatFilter(user, room, connection, message);
+			return Config.chatFilter(message, user, room, connection);
 		}
 		return message;
 	}
@@ -160,10 +160,6 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 	if (!message || !message.trim().length) return;
 	if (!levelsDeep) {
 		levelsDeep = 0;
-		// if (Config.emergencyLog && (connection.ip === '62.195.195.62' || connection.ip === '86.141.154.222' || connection.ip === '189.134.175.221' || message.length > 2048 || message.length > 256 && message.substr(0, 5) !== '/utm ' && message.substr(0, 5) !== '/trn ')) {
-		if (Config.emergencyLog && (user.userid === 'pindapinda' || connection.ip === '62.195.195.62' || connection.ip === '86.141.154.222' || connection.ip === '189.134.175.221')) {
-			Config.emergencyLog.write('<' + user.name + '@' + connection.ip + '> ' + message + '\n');
-		}
 	} else {
 		if (levelsDeep > MAX_PARSE_RECURSION) {
 			return connection.sendTo(room, "Error: Too much recursion");
@@ -341,7 +337,24 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 			}
 		};
 
-		var result = commandHandler.call(context, target, room, user, connection, cmd, message);
+		var result;
+		try {
+			result = commandHandler.call(context, target, room, user, connection, cmd, message);
+		} catch (err) {
+			var stack = err.stack + '\n\n' +
+					'Additional information:\n' +
+					'user = ' + user.name + '\n' +
+					'room = ' + room.id + '\n' +
+					'message = ' + message;
+			var fakeErr = {stack: stack};
+
+			if (!require('./crashlogger.js')(fakeErr, 'A chat command')) {
+				var ministack = ("" + err.stack).escapeHTML().split("\n").slice(0, 2).join("<br />");
+				Rooms.lobby.send('|html|<div class="broadcast-red"><b>POKEMON SHOWDOWN HAS CRASHED:</b> ' + ministack + '</div>');
+			} else {
+				context.sendReply('|html|<div class="broadcast-red"><b>Pokemon Showdown crashed!</b><br />Don\'t worry, we\'re working on fixing it.</div>');
+			}
+		}
 		if (result === undefined) result = false;
 
 		return result;
@@ -349,7 +362,9 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 		// Check for mod/demod/admin/deadmin/etc depending on the group ids
 		var isRoom = false;
 		var promoteCmd = cmd;
-		if (promoteCmd.substr(0, 4) === 'room') {
+		if (promoteCmd.substr(0, 6) === 'global') {
+			promoteCmd = promoteCmd.slice(6);
+		} else if (promoteCmd.substr(0, 4) === 'room') {
 			isRoom = true;
 			promoteCmd = promoteCmd.slice(4);
 		}
@@ -368,7 +383,7 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 	}
 
 	if (message.charAt(0) === '/' && message.charAt(1) !== '/') {
-		message = '/'+message;
+		message = '/' + message;
 	}
 	message = canTalk(user, room, connection, message);
 	if (!message) return false;

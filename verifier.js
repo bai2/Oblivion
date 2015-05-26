@@ -11,12 +11,12 @@
  *
  * @license MIT license
  */
+/* jscs:disable validateIndentation */
 
 // Because I don't want two files, we're going to fork ourselves.
 
 var fakeProcess = new (require('./fake-process').FakeProcess)();
 //if (!process.send) {
-
 	// This is the parent
 
 	var guid = 1;
@@ -37,9 +37,7 @@ var fakeProcess = new (require('./fake-process').FakeProcess)();
 			delete callbackData[response.guid];
 		}
 	});
-
 //} else {
-
 	// This is the child
 
 	global.Config = require('./config/config.js');
@@ -61,4 +59,5 @@ var fakeProcess = new (require('./fake-process').FakeProcess)();
 		});
 	});
 
+	require('./repl.js').start('verifier', function (cmd) { return eval(cmd); });
 //}

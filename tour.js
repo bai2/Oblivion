@@ -165,13 +165,13 @@ exports.tour = function(t) {
 			return true;
 		},
 		lideres: function() {
-			return ['fccamulos','fcjoma','abtryuga','alyssasoraya','000','000','mirandal','davidness','sidaaaaa','knightofwar','000','fcadrielandro','000','000','kruzes'];
+			return ['BlackArien'];
 		},
 		cargos: function() {
 			return ['Lider del Gimnasio Normal','Lider del Gimnasio Hielo','Lider del Gimnasio Lucha','Lider del Gimnasio Bicho','Lider del Gimnasio Roca','Lider del Gimnasio Hada','Lider del Gimnasio Volador','Lider del Gimnasio Fantasma','Lider del Gimnasio Tierra','Lider del Gimnasio Siniestro','Lider del Gimnasio Veneno','Lider del Gimnasio Agua','Lider del Gimnasio Fuego','Lider del Gimnasio Dragon','Lider del Gimnasio Electrico','Miembro del Alto Mando','Miembro del Alto Mando','Miembro del Alto Mando','Miembro del Alto Mando','Miembro del Alto Mando','Campeon'];
 		},
 		altomando: function() {
-			return ['lodtyrana','shinygiratinao','basdgod','riuoker','lodmarcos'];
+			return [''];
 		},
 		lose: function(uid, rid) {
 			/*
@@ -266,7 +266,7 @@ exports.tour = function(t) {
 		},
 		startRaw: function(i) {
 			var room = Rooms.rooms[i];
-			var html = '<hr /><img src="http://s8.postimg.org/h46j3hahh/logohispano.png" width="160" height="120"><h3><font color="SteelBlue">Ronda '+ tour[room.id].roundNum +'!</font></h3><font color="RoyalBlue"><b>FORMATO:</b></font> ' + Tools.data.Formats[tour[room.id].tier].name + "<hr /><center>";
+			var html = '<hr /><img src="http://orig11.deviantart.net/54e6/f/2015/134/2/a/sin_t__tulo_2_copia_by_somnifero-d8td1oq.png" width="220" height="200"><h3><font color="SteelBlue">Ronda '+ tour[room.id].roundNum +'!</font></h3><font color="RoyalBlue"><b>FORMATO:</b></font> ' + Tools.data.Formats[tour[room.id].tier].name + "<hr /><center>";
 			var round = tour[room.id].round;
 			var firstMatch = false;
 			for (var i in round) {
@@ -298,10 +298,10 @@ exports.tour = function(t) {
 			var firstMatch = false;
 			if (w.length == 1) {
 				//end tour
-				Rooms.rooms[rid].addRaw('<img src="http://s8.postimg.org/h46j3hahh/logohispano.png" align="center" width="160" height="120"><h2><font color="SteelBlue">Felicidades <font color="black">' + tour.username(w[0]) + '</font>! has ganado el torneo de formato ' + Tools.data.Formats[tour[rid].tier].name + ' !</font></h2>' + '<br><font color="blue"><b>Segundo Lugar:</b></font> ' + tour.username(l[0]) + '<hr />');
+				Rooms.rooms[rid].addRaw('<img src="http://orig11.deviantart.net/54e6/f/2015/134/2/a/sin_t__tulo_2_copia_by_somnifero-d8td1oq.png" align="center" width="220" height="200"><h2><font color="SteelBlue">Felicidades <font color="black">' + tour.username(w[0]) + '</font>! has ganado el torneo de formato ' + Tools.data.Formats[tour[rid].tier].name + ' !</font></h2>' + '<br><font color="blue"><b>Segundo Lugar:</b></font> ' + tour.username(l[0]) + '<hr />');
 				tour[rid].status = 0;
 			} else {
-				var html = '<hr /><img src="http://s8.postimg.org/h46j3hahh/logohispano.png" align="center" width="160" height="120"><h3><font color="SteelBlue">Ronda '+ tour[rid].roundNum +'!</font></h3><font color="RoyalBlue"><b>Formato:</b></font> ' + Tools.data.Formats[tour[rid].tier].name + "<hr /><center>";
+				var html = '<hr /><img src="http://orig11.deviantart.net/54e6/f/2015/134/2/a/sin_t__tulo_2_copia_by_somnifero-d8td1oq.png" align="center" width="220" height="200"><h3><font color="SteelBlue">Ronda '+ tour[rid].roundNum +'!</font></h3><font color="RoyalBlue"><b>Formato:</b></font> ' + Tools.data.Formats[tour[rid].tier].name + "<hr /><center>";
 				var pBye = new Array();
 				var pNorm = new Array();
 				var p = new Array();
@@ -424,7 +424,7 @@ var cmds = {
 		tour[rid].status = 1;
 		tour[rid].players = new Array();
 
-		Rooms.rooms[rid].addRaw('<hr /><h2><center><img src="http://s8.postimg.org/h46j3hahh/logohispano.png" width="230" /></center><font color="SteelBlue">' + Tools.escapeHTML(user.name) + ' ha iniciado un torneo de tier ' + Tools.data.Formats[tempTourTier].name + '. Si deseas unirte digita </font> <font color="red">/j</font> <font color="steelblue">.</font></h2><b><font color="blueviolet">Jugadores:</font></b> ' + targets[1] + '<br /><font color="RoyalBlue"><b>FORMATO:</b></font> ' + Tools.data.Formats[tempTourTier].name + '<hr /><br /><font color="red"><b>Recuerda que debes mantener tu nombre durante todo el torneo.</b></font>');
+		Rooms.rooms[rid].addRaw('<hr /><h2><center><img src="http://orig11.deviantart.net/54e6/f/2015/134/2/a/sin_t__tulo_2_copia_by_somnifero-d8td1oq.png" width="230" /></center><font color="SteelBlue">' + Tools.escapeHTML(user.name) + ' ha iniciado un torneo de tier ' + Tools.data.Formats[tempTourTier].name + '. Si deseas unirte digita </font> <font color="red">/j</font> <font color="steelblue">.</font></h2><b><font color="blueviolet">Jugadores:</font></b> ' + targets[1] + '<br /><font color="RoyalBlue"><b>FORMATO:</b></font> ' + Tools.data.Formats[tempTourTier].name + '<hr /><br /><font color="red"><b>Recuerda que debes mantener tu nombre durante todo el torneo.</b></font>');
 		if (tour.timers[rid]) Rooms.rooms[rid].addRaw('<i>El torneo empezara en ' + tour.timers[rid].time + ' minuto' + (tour.timers[rid].time == 1 ? '' : 's') + '.<i>');
 	},
 
@@ -598,7 +598,7 @@ var cmds = {
 		if (tour[room.id] == undefined || !tour[room.id].status) return this.sendReply('No hay un torneo activo en esta sala.');
 		if (tour[room.id].status == 1) {
 			tour.reportdue(room);
-			room.addRaw('<hr /><img src="http://s8.postimg.org/h46j3hahh/logohispano.png" align="center" height="120" width="160"><br><h2><font color="SteelBlue">Inscribanse al torneo de formato ' + Tools.data.Formats[tour[room.id].tier].name + '. Digita </font> <font color="red">/j</font> <font color="SteelBlue">para ingresar.</font></h2><b><font color="SkyBlue">JUGADORES:</font></b> ' + (tour[room.id].size === 'Infinity' ? 'ILIMITADOS' : tour[room.id].size) + '<br /><font color="RoyalBlue"><b>FORMATO:</b></font> ' + Tools.data.Formats[tour[room.id].tier].name + '<hr />');
+			room.addRaw('<hr /><img src="http://orig11.deviantart.net/54e6/f/2015/134/2/a/sin_t__tulo_2_copia_by_somnifero-d8td1oq.png" align="center" height="220" width="200"><br><h2><font color="SteelBlue">Inscribanse al torneo de formato ' + Tools.data.Formats[tour[room.id].tier].name + '. Digita </font> <font color="red">/j</font> <font color="SteelBlue">para ingresar.</font></h2><b><font color="SkyBlue">JUGADORES:</font></b> ' + (tour[room.id].size === 'Infinity' ? 'ILIMITADOS' : tour[room.id].size) + '<br /><font color="RoyalBlue"><b>FORMATO:</b></font> ' + Tools.data.Formats[tour[room.id].tier].name + '<hr />');
 		} else {
 			var c = tour[room.id];
 			var unfound = [];
@@ -675,7 +675,7 @@ var cmds = {
 			if (room.decision) return this.sendReply('Prof. Oak: No es un buen momento para usar este comando. No puedes utilizarlo en salas de batalla.');
 			if (tour[room.id] == undefined) return this.sendReply('No hay un torneo activo en una sala.');
 			if (tour[room.id].status < 2) return this.sendReply('No hay torneos fuera de la fase de inscripcion.');
-			var html = '<hr /><h3><img src="http://s8.postimg.org/h46j3hahh/logohispano.png" align="center" width="160" height="120"><font color="SteelBlue">Ronda '+ tour[room.id].roundNum + '!</font></h3><font color="Steelblue"><b>FORMATO:</b></font> ' + Tools.data.Formats[tour[room.id].tier].name + "<hr /><center><small><font color=red>Rojo</font> = descalificado, <font color=\"Azul\">Blue</font> = paso a la siguiente ronda, <a class='ilink'><b>URL</b></a> = combatiendo</small><center>";
+			var html = '<hr /><h3><img src="http://orig11.deviantart.net/54e6/f/2015/134/2/a/sin_t__tulo_2_copia_by_somnifero-d8td1oq.png" align="center" width="220" height="200"><font color="SteelBlue">Ronda '+ tour[room.id].roundNum + '!</font></h3><font color="Steelblue"><b>FORMATO:</b></font> ' + Tools.data.Formats[tour[room.id].tier].name + "<hr /><center><small><font color=red>Rojo</font> = descalificado, <font color=\"Azul\">Blue</font> = paso a la siguiente ronda, <a class='ilink'><b>URL</b></a> = combatiendo</small><center>";
 			var r = tour[room.id].round;
 			var firstMatch = false;
 			for (var i in r) {

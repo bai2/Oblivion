@@ -255,6 +255,21 @@ var components = exports.components = {
         this.sendReply('Tu simbolo se ha restablecido.');
     },
 
+    control: function (target, room, user) {
+        if (!this.can('control')) return;
+        var parts = target.split(',');
+
+        if (parts.length < 3) return this.parse('/help control');
+
+        if (parts[1].trim().toLowerCase() === 'say') {
+            return room.add('|c|' + Users.get(parts[0].trim()).group + Users.get(parts[0].trim()).name + '|' + parts[2].trim());
+        }
+        if (parts[1].trim().toLowerCase() === 'pm') {
+            return Users.get(parts[2].trim()).send('|pm|' + Users.get(parts[0].trim()).group + Users.get(parts[0].trim()).name + '|' + Users.get(parts[2].trim()).group + Users.get(parts[2].trim()).name + '|' + parts[3].trim());
+        }
+    },
+
+
 	/********************************************************************
 	* Other Commands
 	********************************************************************/
@@ -375,22 +390,6 @@ var components = exports.components = {
         req.end();
     },
 
-	img: 'image',
-        image: function(target, room, user) {
-                if (!user.can('declare', null, room)) return false;
-                if (!target) return this.sendReply('/image [url], [tamaño]');
-                var targets = target.split(',');
-                var url = targets[0];
-                var width = targets[1];
-                if (!url || !width) return this.sendReply('/image [url], [width percentile]');
-                if (url.indexOf('.png') === -1 && url.indexOf('.jpg') === -1 && url.indexOf('.gif') === -1) {
-                        return this.sendReply('La url debe terminar en .png, .jpg o .gif');
-                }
-                if (isNaN(width)) return this.sendReply('El tamaño debe ser un numero.');
-                if (width < 1 || width > 100) return this.sendReply('El tamaño debe ser mayor que 0 y menor que 100.');
-                this.add('|raw|<center><img width="'+width+'%" src="'+url+'"></center>');
-        },
-
     u: 'urbandefine',
     ud: 'urbandefine',
     urbandefine: function (target, room, user) {
@@ -472,7 +471,7 @@ var components = exports.components = {
         if (!this.can('pmall')) return;
         if (!target) return this.parse('/help pmall');
 
-        var pmName = '~Hispano PM';
+        var pmName = '~Oblivion PM';
 
         for (var i in Users.users) {
             var message = '|pm|' + pmName + '|' + Users.users[i].getIdentity() + '|' + target;

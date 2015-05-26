@@ -11,7 +11,7 @@ exports.BattleItems = {
 		},
 		num: 674,
 		gen: 6,
-		desc: "Mega-evolves Abomasnow."
+		desc: "If holder is an Abomasnow, this item allows it to Mega Evolve in battle."
 	},
 	"absolite": {
 		id: "absolite",
@@ -25,7 +25,7 @@ exports.BattleItems = {
 		},
 		num: 677,
 		gen: 6,
-		desc: "Mega-evolves Absol."
+		desc: "If holder is an Absol, this item allows it to Mega Evolve in battle."
 	},
 	"absorbbulb": {
 		id: "absorbbulb",
@@ -41,7 +41,7 @@ exports.BattleItems = {
 		},
 		num: 545,
 		gen: 5,
-		desc: "Raises Sp. Atk by 1 if hit by a Water-type attack. Single use."
+		desc: "Raises holder's Sp. Atk by 1 stage if hit by a Water-type attack. Single use."
 	},
 	"adamantorb": {
 		id: "adamantorb",
@@ -72,7 +72,7 @@ exports.BattleItems = {
 		},
 		num: 672,
 		gen: 6,
-		desc: "Mega-evolves Aerodactyl."
+		desc: "If holder is an Aerodactyl, this item allows it to Mega Evolve in battle."
 	},
 	"aggronite": {
 		id: "aggronite",
@@ -86,7 +86,7 @@ exports.BattleItems = {
 		},
 		num: 667,
 		gen: 6,
-		desc: "Mega-evolves Aggron."
+		desc: "If holder is an Aggron, this item allows it to Mega Evolve in battle."
 	},
 	"aguavberry": {
 		id: "aguavberry",
@@ -101,6 +101,9 @@ exports.BattleItems = {
 			if (pokemon.hp <= pokemon.maxhp / 2) {
 				pokemon.eatItem();
 			}
+		},
+		onEatItem: function (item, pokemon) {
+			if (!this.runEvent('TryHeal', pokemon)) return false;
 		},
 		onEat: function (pokemon) {
 			this.heal(pokemon.maxhp / 8);
@@ -129,7 +132,9 @@ exports.BattleItems = {
 			this.debug('effect: ' + effect.id);
 			if (effect.effectType === 'Move') {
 				this.add('-enditem', target, 'Air Balloon');
-				target.setItem('');
+				target.item = '';
+				this.itemData = {id: '', target: this};
+				this.runEvent('AfterUseItem', target, null, null, 'airballoon');
 			}
 		},
 		onAfterSubDamage: function (damage, target, source, effect) {
@@ -155,7 +160,21 @@ exports.BattleItems = {
 		},
 		num: -6,
 		gen: 6,
-		desc: "Mega-evolves Alakazam."
+		desc: "If holder is an Alakazam, this item allows it to Mega Evolve in battle."
+	},
+	"altarianite": {
+		id: "altarianite",
+		name: "Altarianite",
+		spritenum: 615,
+		megaStone: "Altaria-Mega",
+		megaEvolves: "Altaria",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 755,
+		gen: 6,
+		desc: "If holder is an Altaria, this item allows it to Mega Evolve in battle."
 	},
 	"ampharosite": {
 		id: "ampharosite",
@@ -169,7 +188,7 @@ exports.BattleItems = {
 		},
 		num: -6,
 		gen: 6,
-		desc: "Mega-evolves Ampharos."
+		desc: "If holder is an Ampharos, this item allows it to Mega Evolve in battle."
 	},
 	"apicotberry": {
 		id: "apicotberry",
@@ -181,7 +200,7 @@ exports.BattleItems = {
 			type: "Ground"
 		},
 		onUpdate: function (pokemon) {
-			if (pokemon.hp <= pokemon.maxhp / 4|| (pokemon.hp <= pokemon.maxhp / 2 && pokemon.hasAbility('gluttony'))) {
+			if (pokemon.hp <= pokemon.maxhp / 4 || (pokemon.hp <= pokemon.maxhp / 2 && pokemon.hasAbility('gluttony'))) {
 				pokemon.eatItem();
 			}
 		},
@@ -190,7 +209,7 @@ exports.BattleItems = {
 		},
 		num: 205,
 		gen: 3,
-		desc: "Raises Sp. Def by 1 when at 1/4 max HP or less. Single use."
+		desc: "Raises holder's Sp. Def by 1 stage when at 1/4 max HP or less. Single use."
 	},
 	"armorfossil": {
 		id: "armorfossil",
@@ -237,17 +256,31 @@ exports.BattleItems = {
 		onModifySpD: function (spd) {
 			return this.chainModify(1.5);
 		},
-		onModifyPokemon: function (pokemon) {
+		onDisableMove: function (pokemon) {
 			var moves = pokemon.moveset;
 			for (var i = 0; i < moves.length; i++) {
 				if (this.getMove(moves[i].move).category === 'Status') {
-					moves[i].disabled = true;
+					pokemon.disableMove(moves[i].id);
 				}
 			}
 		},
 		num: -6,
 		gen: 6,
-		desc: "Holder's Sp. Def is 1.5x, but it can only use damaging moves."
+		desc: "Holder's Sp. Def is 1.5x, but it can only select damaging moves."
+	},
+	"audinite": {
+		id: "audinite",
+		name: "Audinite",
+		spritenum: 617,
+		megaStone: "Audino-Mega",
+		megaEvolves: "Audino",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 757,
+		gen: 6,
+		desc: "If holder is an Audino, this item allows it to Mega Evolve in battle."
 	},
 	"babiriberry": {
 		id: "babiriberry",
@@ -259,7 +292,7 @@ exports.BattleItems = {
 			type: "Steel"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Steel' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Steel' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -269,7 +302,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 199,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Steel-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Steel-type attack. Single use."
 	},
 	"banettite": {
 		id: "banettite",
@@ -283,7 +316,21 @@ exports.BattleItems = {
 		},
 		num: 668,
 		gen: 6,
-		desc: "Mega-evolves Banette."
+		desc: "If holder is a Banette, this item allows it to Mega Evolve in battle."
+	},
+	"beedrillite": {
+		id: "beedrillite",
+		name: "Beedrillite",
+		spritenum: 628,
+		megaStone: "Beedrill-Mega",
+		megaEvolves: "Beedrill",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 770,
+		gen: 6,
+		desc: "If holder is a Beedrill, this item allows it to Mega Evolve in battle."
 	},
 	"belueberry": {
 		id: "belueberry",
@@ -307,14 +354,14 @@ exports.BattleItems = {
 		},
 		onUpdate: function (pokemon) {
 			if (pokemon.hp <= pokemon.maxhp / 2) {
-				if (pokemon.useItem()) {
+				if (this.runEvent('TryHeal', pokemon) && pokemon.useItem()) {
 					this.heal(20);
 				}
 			}
 		},
 		num: 43,
 		gen: 2,
-		desc: "Restores 20HP when at 1/2 max HP or less. Single use."
+		desc: "Restores 20 HP when at 1/2 max HP or less. Single use."
 	},
 	"bigroot": {
 		id: "bigroot",
@@ -381,7 +428,7 @@ exports.BattleItems = {
 		},
 		num: 281,
 		gen: 4,
-		desc: "Each turn, if holder is a Poison-type, restores 1/16 max HP; loses 1/8 if not."
+		desc: "Each turn, if holder is a Poison type, restores 1/16 max HP; loses 1/8 if not."
 	},
 	"blackglasses": {
 		id: "blackglasses",
@@ -412,7 +459,7 @@ exports.BattleItems = {
 		},
 		num: -6,
 		gen: 6,
-		desc: "Mega-evolves Blastoise."
+		desc: "If holder is a Blastoise, this item allows it to Mega Evolve in battle."
 	},
 	"blazikenite": {
 		id: "blazikenite",
@@ -426,7 +473,32 @@ exports.BattleItems = {
 		},
 		num: 664,
 		gen: 6,
-		desc: "Mega-evolves Blaziken."
+		desc: "If holder is a Blaziken, this item allows it to Mega Evolve in battle."
+	},
+	"blueorb": {
+		id: "blueorb",
+		name: "Blue Orb",
+		spritenum: 41,
+		onSwitchInPriority: -6,
+		onSwitchIn: function (pokemon) {
+			if (pokemon.isActive && pokemon.baseTemplate.species === 'Kyogre') {
+				var template = this.getTemplate('Kyogre-Primal');
+				pokemon.formeChange(template);
+				pokemon.baseTemplate = template;
+				pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
+				this.add('detailschange', pokemon, pokemon.details);
+				this.add('message', pokemon.name + "'s Primal Reversion! It reverted to its primal form!");
+				pokemon.setAbility(template.abilities['0']);
+				pokemon.baseAbility = pokemon.ability;
+			}
+		},
+		onTakeItem: function (item, source) {
+			if (source.baseTemplate.baseSpecies === 'Kyogre') return false;
+			return true;
+		},
+		num: -6,
+		gen: 6,
+		desc: "If holder is a Kyogre, this item triggers its Primal Reversion in battle."
 	},
 	"blukberry": {
 		id: "blukberry",
@@ -480,9 +552,6 @@ exports.BattleItems = {
 		id: "burndrive",
 		name: "Burn Drive",
 		spritenum: 54,
-		fling: {
-			basePower: 70
-		},
 		onTakeItem: function (item, pokemon, source) {
 			if ((source && source.baseTemplate.num === 649) || pokemon.baseTemplate.num === 649) {
 				return false;
@@ -492,7 +561,21 @@ exports.BattleItems = {
 		onDrive: 'Fire',
 		num: 118,
 		gen: 5,
-		desc: "Holder's Techno Blast is Fire-type."
+		desc: "Holder's Techno Blast is Fire type."
+	},
+	"cameruptite": {
+		id: "cameruptite",
+		name: "Cameruptite",
+		spritenum: 625,
+		megaStone: "Camerupt-Mega",
+		megaEvolves: "Camerupt",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 767,
+		gen: 6,
+		desc: "If holder is a Camerupt, this item allows it to Mega Evolve in battle."
 	},
 	"cellbattery": {
 		id: "cellbattery",
@@ -508,7 +591,7 @@ exports.BattleItems = {
 		},
 		num: 546,
 		gen: 5,
-		desc: "Raises Attack by 1 if hit by an Electric-type attack. Single use."
+		desc: "Raises holder's Attack by 1 if hit by an Electric-type attack. Single use."
 	},
 	"charcoal": {
 		id: "charcoal",
@@ -539,7 +622,7 @@ exports.BattleItems = {
 		},
 		num: 660,
 		gen: 6,
-		desc: "Mega-evolves Charizard into Mega Charizard X."
+		desc: "If holder is a Charizard, this item allows it to Mega Evolve in battle."
 	},
 	"charizarditey": {
 		id: "charizarditey",
@@ -553,7 +636,7 @@ exports.BattleItems = {
 		},
 		num: 678,
 		gen: 6,
-		desc: "Mega-evolves Charizard into Mega Charizard Y."
+		desc: "If holder is a Charizard, this item allows it to Mega Evolve in battle."
 	},
 	"chartiberry": {
 		id: "chartiberry",
@@ -565,7 +648,7 @@ exports.BattleItems = {
 			type: "Rock"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Rock' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Rock' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -575,7 +658,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 195,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Rock-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Rock-type attack. Single use."
 	},
 	"cheriberry": {
 		id: "cheriberry",
@@ -657,9 +740,6 @@ exports.BattleItems = {
 		id: "chilldrive",
 		name: "Chill Drive",
 		spritenum: 67,
-		fling: {
-			basePower: 70
-		},
 		onTakeItem: function (item, pokemon, source) {
 			if ((source && source.baseTemplate.num === 649) || pokemon.baseTemplate.num === 649) {
 				return false;
@@ -669,7 +749,7 @@ exports.BattleItems = {
 		onDrive: 'Ice',
 		num: 119,
 		gen: 5,
-		desc: "Holder's Techno Blast is Ice-type."
+		desc: "Holder's Techno Blast is Ice type."
 	},
 	"choiceband": {
 		id: "choiceband",
@@ -694,7 +774,7 @@ exports.BattleItems = {
 		isChoice: true,
 		num: 220,
 		gen: 3,
-		desc: "Holder's Attack is 1.5x, but it can only use the first move it selects."
+		desc: "Holder's Attack is 1.5x, but it can only select the first move it executes."
 	},
 	"choicescarf": {
 		id: "choicescarf",
@@ -718,7 +798,7 @@ exports.BattleItems = {
 		isChoice: true,
 		num: 287,
 		gen: 4,
-		desc: "Holder's Speed is 1.5x, but it can only use the first move it selects."
+		desc: "Holder's Speed is 1.5x, but it can only select the first move it executes."
 	},
 	"choicespecs": {
 		id: "choicespecs",
@@ -743,7 +823,7 @@ exports.BattleItems = {
 		isChoice: true,
 		num: 297,
 		gen: 4,
-		desc: "Holder's Sp. Atk is 1.5x, but it can only use the first move it selects."
+		desc: "Holder's Sp. Atk is 1.5x, but it can only select the first move it executes."
 	},
 	"chopleberry": {
 		id: "chopleberry",
@@ -755,7 +835,7 @@ exports.BattleItems = {
 			type: "Fighting"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Fighting' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Fighting' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -765,7 +845,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 189,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Fighting-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Fighting-type attack. Single use."
 	},
 	"clawfossil": {
 		id: "clawfossil",
@@ -788,7 +868,7 @@ exports.BattleItems = {
 			type: "Flying"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Flying' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Flying' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -798,7 +878,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 192,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Flying-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Flying-type attack. Single use."
 	},
 	"colburberry": {
 		id: "colburberry",
@@ -810,7 +890,7 @@ exports.BattleItems = {
 			type: "Dark"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Dark' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Dark' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -820,7 +900,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 198,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Dark-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Dark-type attack. Single use."
 	},
 	"cornnberry": {
 		id: "cornnberry",
@@ -849,7 +929,6 @@ exports.BattleItems = {
 	"custapberry": {
 		id: "custapberry",
 		name: "Custap Berry",
-		isUnreleased: true,
 		spritenum: 86,
 		isBerry: true,
 		naturalGift: {
@@ -950,6 +1029,20 @@ exports.BattleItems = {
 		gen: 4,
 		desc: "If holder becomes infatuated, the other Pokemon also becomes infatuated."
 	},
+	"diancite": {
+		id: "diancite",
+		name: "Diancite",
+		spritenum: 624,
+		megaStone: "Diancie-Mega",
+		megaEvolves: "Diancie",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 764,
+		gen: 6,
+		desc: "If holder is a Diancie, this item allows it to Mega Evolve in battle."
+	},
 	"diveball": {
 		id: "diveball",
 		name: "Dive Ball",
@@ -973,9 +1066,6 @@ exports.BattleItems = {
 		id: "dousedrive",
 		name: "Douse Drive",
 		spritenum: 103,
-		fling: {
-			basePower: 70
-		},
 		onTakeItem: function (item, pokemon, source) {
 			if ((source && source.baseTemplate.num === 649) || pokemon.baseTemplate.num === 649) {
 				return false;
@@ -985,15 +1075,12 @@ exports.BattleItems = {
 		onDrive: 'Water',
 		num: 116,
 		gen: 5,
-		desc: "Holder's Techno Blast is Water-type."
+		desc: "Holder's Techno Blast is Water type."
 	},
 	"dracoplate": {
 		id: "dracoplate",
 		name: "Draco Plate",
 		spritenum: 105,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Dragon',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -1001,9 +1088,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 311,
 		gen: 4,
-		desc: "Holder's Dragon-type attacks have 1.2x power. Judgment is Dragon-type."
+		desc: "Holder's Dragon-type attacks have 1.2x power. Judgment is Dragon type."
 	},
 	"dragonfang": {
 		id: "dragonfang",
@@ -1045,9 +1138,6 @@ exports.BattleItems = {
 		id: "dreadplate",
 		name: "Dread Plate",
 		spritenum: 110,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Dark',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -1055,9 +1145,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 312,
 		gen: 4,
-		desc: "Holder's Dark-type attacks have 1.2x power. Judgment is Dark-type."
+		desc: "Holder's Dark-type attacks have 1.2x power. Judgment is Dark type."
 	},
 	"dreamball": {
 		id: "dreamball",
@@ -1092,9 +1188,6 @@ exports.BattleItems = {
 		id: "earthplate",
 		name: "Earth Plate",
 		spritenum: 117,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Ground',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -1102,9 +1195,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 305,
 		gen: 4,
-		desc: "Holder's Ground-type attacks have 1.2x power. Judgment is Ground-type."
+		desc: "Holder's Ground-type attacks have 1.2x power. Judgment is Ground type."
 	},
 	"ejectbutton": {
 		id: "ejectbutton",
@@ -1113,15 +1212,12 @@ exports.BattleItems = {
 		fling: {
 			basePower: 30
 		},
-		onHit: function (target, source, move) {
-			if (source && source !== target && target.hp && move && move.selfSwitch) {
-				move.selfSwitch = false;
-			}
-		},
 		onAfterMoveSecondary: function (target, source, move) {
 			if (source && source !== target && target.hp && move && move.category !== 'Status') {
+				if (!this.canSwitch(target.side) || target.forceSwitchFlag) return;
 				if (target.useItem()) {
 					target.switchFlag = true;
+					source.switchFlag = false;
 				}
 			}
 		},
@@ -1168,7 +1264,7 @@ exports.BattleItems = {
 		},
 		num: 34,
 		gen: 2,
-		desc: "Restores 50HP to one Pokemon but lowers Happiness."
+		desc: "Restores 50 HP to one Pokemon but lowers Happiness."
 	},
 	"enigmaberry": {
 		id: "enigmaberry",
@@ -1179,8 +1275,8 @@ exports.BattleItems = {
 			basePower: 100,
 			type: "Bug"
 		},
-		onSourceBasePower: function (basePower, user, target, move) {
-			if (move && this.getEffectiveness(move, target) > 0) {
+		onSourceModifyDamage: function (damage, source, target, move) {
+			if (move && move.typeMod > 0) {
 				target.addVolatile('enigmaberry');
 			}
 		},
@@ -1192,12 +1288,15 @@ exports.BattleItems = {
 				}
 			}
 		},
+		onEatItem: function (item, pokemon) {
+			if (!this.runEvent('TryHeal', pokemon)) return false;
+		},
 		onEat: function (pokemon) {
 			this.heal(pokemon.maxhp / 4);
 		},
 		num: 208,
 		gen: 3,
-		desc: "Restores 1/4 max HP when holder is hit by a super effective move. Single use."
+		desc: "Restores 1/4 max HP after holder is hit by a supereffective move. Single use."
 	},
 	"eviolite": {
 		id: "eviolite",
@@ -1230,19 +1329,19 @@ exports.BattleItems = {
 			basePower: 10
 		},
 		onModifyDamage: function (damage, source, target, move) {
-			if (move && this.getEffectiveness(move, target) > 0) {
+			if (move && move.typeMod > 0) {
 				return this.chainModify(1.2);
 			}
 		},
 		num: 268,
 		gen: 4,
-		desc: "Holder's super effective attacks against other Pokemon do 1.2x damage."
+		desc: "Holder's attacks that are super effective against the target do 1.2x damage."
 	},
 	"fairygem": {
 		id: "fairygem",
 		name: "Fairy Gem",
 		isUnreleased: true,
-		spritenum: 0,
+		spritenum: 611,
 		isGem: true,
 		onSourceTryPrimaryHit: function (target, source, move) {
 			if (target === source || move.category === 'Status') return;
@@ -1298,6 +1397,9 @@ exports.BattleItems = {
 				pokemon.eatItem();
 			}
 		},
+		onEatItem: function (item, pokemon) {
+			if (!this.runEvent('TryHeal', pokemon)) return false;
+		},
 		onEat: function (pokemon) {
 			this.heal(pokemon.maxhp / 8);
 			if (pokemon.getNature().minus === 'atk') {
@@ -1331,9 +1433,6 @@ exports.BattleItems = {
 		id: "fistplate",
 		name: "Fist Plate",
 		spritenum: 143,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Fighting',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -1341,9 +1440,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 303,
 		gen: 4,
-		desc: "Holder's Fighting-type attacks have 1.2x power. Judgment is Fighting-type."
+		desc: "Holder's Fighting-type attacks have 1.2x power. Judgment is Fighting type."
 	},
 	"flameorb": {
 		id: "flameorb",
@@ -1366,9 +1471,6 @@ exports.BattleItems = {
 		id: "flameplate",
 		name: "Flame Plate",
 		spritenum: 146,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Fire',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -1376,9 +1478,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 298,
 		gen: 4,
-		desc: "Holder's Fire-type attacks have 1.2x power. Judgment is Fire-type."
+		desc: "Holder's Fire-type attacks have 1.2x power. Judgment is Fire type."
 	},
 	"floatstone": {
 		id: "floatstone",
@@ -1387,8 +1495,8 @@ exports.BattleItems = {
 		fling: {
 			basePower: 30
 		},
-		onModifyPokemon: function (pokemon) {
-			pokemon.weightkg /= 2;
+		onModifyWeight: function (weight) {
+			return weight / 2;
 		},
 		num: 539,
 		gen: 5,
@@ -1422,13 +1530,13 @@ exports.BattleItems = {
 		},
 		onDamage: function (damage, target, source, effect) {
 			if (this.random(10) === 0 && damage >= target.hp && effect && effect.effectType === 'Move') {
-				this.add("-message", target.name + " held on using its Focus Band! (placeholder)");
+				this.add("-activate", target, "item: Focus Band");
 				return target.hp - 1;
 			}
 		},
 		num: 230,
 		gen: 2,
-		desc: "Holder has a 10% chance to survive an attack that would KO it with 1HP."
+		desc: "Holder has a 10% chance to survive an attack that would KO it with 1 HP."
 	},
 	"focussash": {
 		id: "focussash",
@@ -1446,7 +1554,7 @@ exports.BattleItems = {
 		},
 		num: 275,
 		gen: 4,
-		desc: "If holder's HP is full, will survive an attack that would KO it with 1HP. Single use."
+		desc: "If holder's HP is full, will survive an attack that would KO it with 1 HP. Single use."
 	},
 	"friendball": {
 		id: "friendball",
@@ -1472,6 +1580,20 @@ exports.BattleItems = {
 		gen: 4,
 		desc: "Holder moves last in its priority bracket."
 	},
+	"galladite": {
+		id: "galladite",
+		name: "Galladite",
+		spritenum: 616,
+		megaStone: "Gallade-Mega",
+		megaEvolves: "Gallade",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 756,
+		gen: 6,
+		desc: "If holder is a Gallade, this item allows it to Mega Evolve in battle."
+	},
 	"ganlonberry": {
 		id: "ganlonberry",
 		name: "Ganlon Berry",
@@ -1491,7 +1613,7 @@ exports.BattleItems = {
 		},
 		num: 202,
 		gen: 3,
-		desc: "Raises Defense by 1 when at 1/4 max HP or less. Single use."
+		desc: "Raises holder's Defense by 1 stage when at 1/4 max HP or less. Single use."
 	},
 	"garchompite": {
 		id: "garchompite",
@@ -1505,7 +1627,7 @@ exports.BattleItems = {
 		},
 		num: 683,
 		gen: 6,
-		desc: "Mega-evolves Garchomp."
+		desc: "If holder is a Garchomp, this item allows it to Mega Evolve in battle."
 	},
 	"gardevoirite": {
 		id: "gardevoirite",
@@ -1519,7 +1641,7 @@ exports.BattleItems = {
 		},
 		num: 657,
 		gen: 6,
-		desc: "Mega-evolves Gardevoir."
+		desc: "If holder is a Gardevoir, this item allows it to Mega Evolve in battle."
 	},
 	"gengarite": {
 		id: "gengarite",
@@ -1533,7 +1655,7 @@ exports.BattleItems = {
 		},
 		num: 656,
 		gen: 6,
-		desc: "Mega-evolves Gengar."
+		desc: "If holder is a Gengar, this item allows it to Mega Evolve in battle."
 	},
 	"ghostgem": {
 		id: "ghostgem",
@@ -1553,6 +1675,20 @@ exports.BattleItems = {
 		num: 560,
 		gen: 5,
 		desc: "Holder's first successful Ghost-type attack will have 1.3x power. Single use."
+	},
+	"glalitite": {
+		id: "glalitite",
+		name: "Glalitite",
+		spritenum: 623,
+		megaStone: "Glalie-Mega",
+		megaEvolves: "Glalie",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 763,
+		gen: 6,
+		desc: "If holder is a Glalie, this item allows it to Mega Evolve in battle."
 	},
 	"grassgem": {
 		id: "grassgem",
@@ -1660,7 +1796,7 @@ exports.BattleItems = {
 		},
 		num: 676,
 		gen: 6,
-		desc: "Mega-evolves Gyarados."
+		desc: "If holder is a Gyarados, this item allows it to Mega Evolve in battle."
 	},
 	"habanberry": {
 		id: "habanberry",
@@ -1672,7 +1808,7 @@ exports.BattleItems = {
 			type: "Dragon"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Dragon' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Dragon' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -1682,7 +1818,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 197,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Dragon-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Dragon-type attack. Single use."
 	},
 	"hardstone": {
 		id: "hardstone",
@@ -1751,7 +1887,7 @@ exports.BattleItems = {
 		},
 		num: 680,
 		gen: 6,
-		desc: "Mega-evolves Heracross."
+		desc: "If holder is a Heracross, this item allows it to Mega Evolve in battle."
 	},
 	"hondewberry": {
 		id: "hondewberry",
@@ -1778,7 +1914,7 @@ exports.BattleItems = {
 		},
 		num: 666,
 		gen: 6,
-		desc: "Mega-evolves Houndoom."
+		desc: "If holder is a Houndoom, this item allows it to Mega Evolve in battle."
 	},
 	"iapapaberry": {
 		id: "iapapaberry",
@@ -1793,6 +1929,9 @@ exports.BattleItems = {
 			if (pokemon.hp <= pokemon.maxhp / 2) {
 				pokemon.eatItem();
 			}
+		},
+		onEatItem: function (item, pokemon) {
+			if (!this.runEvent('TryHeal', pokemon)) return false;
 		},
 		onEat: function (pokemon) {
 			this.heal(pokemon.maxhp / 8);
@@ -1827,9 +1966,6 @@ exports.BattleItems = {
 		id: "icicleplate",
 		name: "Icicle Plate",
 		spritenum: 220,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Ice',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -1837,9 +1973,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 302,
 		gen: 4,
-		desc: "Holder's Ice-type attacks have 1.2x power. Judgment is Ice-type."
+		desc: "Holder's Ice-type attacks have 1.2x power. Judgment is Ice type."
 	},
 	"icyrock": {
 		id: "icyrock",
@@ -1856,9 +1998,6 @@ exports.BattleItems = {
 		id: "insectplate",
 		name: "Insect Plate",
 		spritenum: 223,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Bug',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -1866,9 +2005,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 308,
 		gen: 4,
-		desc: "Holder's Bug-type attacks have 1.2x power. Judgment is Bug-type."
+		desc: "Holder's Bug-type attacks have 1.2x power. Judgment is Bug type."
 	},
 	"ironball": {
 		id: "ironball",
@@ -1886,15 +2031,12 @@ exports.BattleItems = {
 		},
 		num: 278,
 		gen: 4,
-		desc: "Holder's Speed halved, becomes grounded, and takes 1x from Ground."
+		desc: "Holder is grounded, Speed halved. If Flying type, takes neutral Ground damage."
 	},
 	"ironplate": {
 		id: "ironplate",
 		name: "Iron Plate",
 		spritenum: 225,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Steel',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -1902,9 +2044,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 313,
 		gen: 4,
-		desc: "Holder's Steel-type attacks have 1.2x power. Judgment is Steel-type."
+		desc: "Holder's Steel-type attacks have 1.2x power. Judgment is Steel type."
 	},
 	"jabocaberry": {
 		id: "jabocaberry",
@@ -1937,7 +2085,7 @@ exports.BattleItems = {
 			type: "Ghost"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Ghost' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Ghost' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -1947,7 +2095,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 196,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Ghost-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Ghost-type attack. Single use."
 	},
 	"kebiaberry": {
 		id: "kebiaberry",
@@ -1959,7 +2107,7 @@ exports.BattleItems = {
 			type: "Poison"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Poison' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Poison' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -1969,7 +2117,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 190,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Poison-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Poison-type attack. Single use."
 	},
 	"keeberry": {
 		id: "keeberry",
@@ -1990,7 +2138,7 @@ exports.BattleItems = {
 		},
 		num: -6,
 		gen: 6,
-		desc: "Raises Defense by 1 if hit by a Physical attack. Single use."
+		desc: "Raises holder's Defense by 1 stage if hit by a physical attack. Single use."
 	},
 	"kelpsyberry": {
 		id: "kelpsyberry",
@@ -2017,7 +2165,7 @@ exports.BattleItems = {
 		},
 		num: 675,
 		gen: 6,
-		desc: "Mega-evolves Kangaskhan."
+		desc: "If holder is a Kangaskhan, this item allows it to Mega Evolve in battle."
 	},
 	"kingsrock": {
 		id: "kingsrock",
@@ -2083,32 +2231,30 @@ exports.BattleItems = {
 	"latiasite": {
 		id: "latiasite",
 		name: "Latiasite",
-		spritenum: -6,
+		spritenum: 629,
 		megaStone: "Latias-Mega",
 		megaEvolves: "Latias",
-		isUnreleased: true,
 		onTakeItem: function (item, source) {
 			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
 			return true;
 		},
 		num: -6,
 		gen: 6,
-		desc: "Mega-evolves Latias."
+		desc: "If holder is a Latias, this item allows it to Mega Evolve in battle."
 	},
 	"latiosite": {
 		id: "latiosite",
 		name: "Latiosite",
-		spritenum: -6,
+		spritenum: 630,
 		megaStone: "Latios-Mega",
 		megaEvolves: "Latios",
-		isUnreleased: true,
 		onTakeItem: function (item, source) {
 			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
 			return true;
 		},
 		num: -6,
 		gen: 6,
-		desc: "Mega-evolves Latios."
+		desc: "If holder is a Latios, this item allows it to Mega Evolve in battle."
 	},
 	"laxincense": {
 		id: "laxincense",
@@ -2175,11 +2321,11 @@ exports.BattleItems = {
 			}
 			move.pp += 10;
 			if (move.pp > move.maxpp) move.pp = move.maxpp;
-			this.add("-message", pokemon.name + " restored " + move.move + "'s PP using its Leppa Berry! (placeholder)");
+			this.add('-activate', pokemon, 'item: Leppa Berry', move.move);
 		},
 		num: 154,
 		gen: 3,
-		desc: "Restores 10PP to the first of the holder's moves to reach 0PP. Single use."
+		desc: "Restores 10 PP to the first of the holder's moves to reach 0 PP. Single use."
 	},
 	"levelball": {
 		id: "levelball",
@@ -2208,7 +2354,7 @@ exports.BattleItems = {
 		},
 		num: 201,
 		gen: 3,
-		desc: "Raises Attack by 1 when at 1/4 max HP or less. Single use."
+		desc: "Raises holder's Attack by 1 stage when at 1/4 max HP or less. Single use."
 	},
 	"lifeorb": {
 		id: "lifeorb",
@@ -2234,7 +2380,7 @@ exports.BattleItems = {
 		},
 		num: 270,
 		gen: 4,
-		desc: "Holder's damaging moves do 1.3x damage; loses 1/10 max HP after the attack."
+		desc: "Holder's attacks do 1.3x damage, and it loses 1/10 its max HP after the attack."
 	},
 	"lightball": {
 		id: "lightball",
@@ -2246,13 +2392,13 @@ exports.BattleItems = {
 		},
 		onModifyAtkPriority: 1,
 		onModifyAtk: function (atk, pokemon) {
-			if (pokemon.baseTemplate.species === 'Pikachu') {
+			if (pokemon.baseTemplate.baseSpecies === 'Pikachu') {
 				return this.chainModify(2);
 			}
 		},
 		onModifySpAPriority: 1,
 		onModifySpA: function (spa, pokemon) {
-			if (pokemon.baseTemplate.species === 'Pikachu') {
+			if (pokemon.baseTemplate.baseSpecies === 'Pikachu') {
 				return this.chainModify(2);
 			}
 		},
@@ -2271,6 +2417,20 @@ exports.BattleItems = {
 		num: 269,
 		gen: 4,
 		desc: "Holder's use of Light Screen or Reflect lasts 8 turns instead of 5."
+	},
+	"lopunnite": {
+		id: "lopunnite",
+		name: "Lopunnite",
+		spritenum: 626,
+		megaStone: "Lopunny-Mega",
+		megaEvolves: "Lopunny",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 768,
+		gen: 6,
+		desc: "If holder is a Lopunny, this item allows it to Mega Evolve in battle."
 	},
 	"loveball": {
 		id: "loveball",
@@ -2292,7 +2452,7 @@ exports.BattleItems = {
 		},
 		num: 673,
 		gen: 6,
-		desc: "Mega-evolves Lucario."
+		desc: "If holder is a Lucario, this item allows it to Mega Evolve in battle."
 	},
 	"luckypunch": {
 		id: "luckypunch",
@@ -2308,7 +2468,7 @@ exports.BattleItems = {
 		},
 		num: 256,
 		gen: 2,
-		desc: "If holder is a Chansey, its critical hit ratio is boosted by 2."
+		desc: "If holder is a Chansey, its critical hit ratio is raised by 2 stages."
 	},
 	"lumberry": {
 		id: "lumberry",
@@ -2330,7 +2490,7 @@ exports.BattleItems = {
 		},
 		num: 157,
 		gen: 3,
-		desc: "Holder cures itself if it is confused or has a major status problem. Single use."
+		desc: "Holder cures itself if it is confused or has a major status condition. Single use."
 	},
 	"luminousmoss": {
 		id: "luminousmoss",
@@ -2346,7 +2506,7 @@ exports.BattleItems = {
 		},
 		num: -6,
 		gen: 6,
-		desc: "Raises Special Defense by 1 if hit by a Water-type attack. Single use."
+		desc: "Raises holder's Sp. Def by 1 stage if hit by a Water-type attack. Single use."
 	},
 	"lureball": {
 		id: "lureball",
@@ -2426,6 +2586,9 @@ exports.BattleItems = {
 				pokemon.eatItem();
 			}
 		},
+		onEatItem: function (item, pokemon) {
+			if (!this.runEvent('TryHeal', pokemon)) return false;
+		},
 		onEat: function (pokemon) {
 			this.heal(pokemon.maxhp / 8);
 			if (pokemon.getNature().minus === 'spe') {
@@ -2453,7 +2616,9 @@ exports.BattleItems = {
 		id: "mail",
 		name: "Mail",
 		spritenum: 403,
-		onTakeItem: false,
+		onTakeItem: function (item, source) {
+			if (!this.activeMove || this.activeMove.id !== 'knockoff') return false;
+		},
 		isUnreleased: true,
 		gen: 2,
 		desc: "This item cannot be given to or taken from a Pokemon, except by Knock Off."
@@ -2470,7 +2635,7 @@ exports.BattleItems = {
 		},
 		num: 682,
 		gen: 6,
-		desc: "Mega-evolves Manectric."
+		desc: "If holder is a Manectric, this item allows it to Mega Evolve in battle."
 	},
 	"marangaberry": {
 		id: "marangaberry",
@@ -2491,7 +2656,7 @@ exports.BattleItems = {
 		},
 		num: -6,
 		gen: 6,
-		desc: "Raises Special Defense by 1 if hit by a Special attack. Single use."
+		desc: "Raises holder's Sp. Def by 1 stage if hit by a special attack. Single use."
 	},
 	"masterball": {
 		id: "masterball",
@@ -2513,15 +2678,12 @@ exports.BattleItems = {
 		},
 		num: 681,
 		gen: 6,
-		desc: "Mega-evolves Mawile."
+		desc: "If holder is a Mawile, this item allows it to Mega Evolve in battle."
 	},
 	"meadowplate": {
 		id: "meadowplate",
 		name: "Meadow Plate",
 		spritenum: 282,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Grass',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -2529,9 +2691,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 301,
 		gen: 4,
-		desc: "Holder's Grass-type attacks have 1.2x power. Judgment is Grass-type."
+		desc: "Holder's Grass-type attacks have 1.2x power. Judgment is Grass type."
 	},
 	"medichamite": {
 		id: "medichamite",
@@ -2545,7 +2713,7 @@ exports.BattleItems = {
 		},
 		num: 665,
 		gen: 6,
-		desc: "Mega-evolves Medicham."
+		desc: "If holder is a Medicham, this item allows it to Mega Evolve in battle."
 	},
 	"mentalherb": {
 		id: "mentalherb",
@@ -2554,7 +2722,7 @@ exports.BattleItems = {
 		fling: {
 			basePower: 10,
 			effect: function (pokemon) {
-				var conditions = ['attract', 'taunt', 'encore', 'torment', 'disable'];
+				var conditions = ['attract', 'taunt', 'encore', 'torment', 'disable', 'healblock'];
 				for (var i = 0; i < conditions.length; i++) {
 					if (pokemon.volatiles[conditions[i]]) {
 						for (var j = 0; j < conditions.length; j++) {
@@ -2566,7 +2734,7 @@ exports.BattleItems = {
 			}
 		},
 		onUpdate: function (pokemon) {
-			var conditions = ['attract', 'taunt', 'encore', 'torment', 'disable'];
+			var conditions = ['attract', 'taunt', 'encore', 'torment', 'disable', 'healblock'];
 			for (var i = 0; i < conditions.length; i++) {
 				if (pokemon.volatiles[conditions[i]]) {
 					if (!pokemon.useItem()) return;
@@ -2579,7 +2747,21 @@ exports.BattleItems = {
 		},
 		num: 219,
 		gen: 3,
-		desc: "Cures holder if affected by Attract, Disable, Encore, Taunt, Torment. Single use."
+		desc: "Cures holder of Attract, Disable, Encore, Heal Block, Taunt, Torment. Single use."
+	},
+	"metagrossite": {
+		id: "metagrossite",
+		name: "Metagrossite",
+		spritenum: 618,
+		megaStone: "Metagross-Mega",
+		megaEvolves: "Metagross",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 758,
+		gen: 6,
+		desc: "If holder is a Metagross, this item allows it to Mega Evolve in battle."
 	},
 	"metalcoat": {
 		id: "metalcoat",
@@ -2635,8 +2817,11 @@ exports.BattleItems = {
 					pokemon.removeVolatile('metronome');
 					return;
 				}
-				if (this.effectData.lastMove === move.id) this.effectData.numConsecutive++;
-				else this.effectData.numConsecutive = 0;
+				if (this.effectData.lastMove === move.id) {
+					this.effectData.numConsecutive++;
+				} else {
+					this.effectData.numConsecutive = 0;
+				}
 				this.effectData.lastMove = move.id;
 			},
 			onModifyDamage: function (damage, source, target, move) {
@@ -2661,7 +2846,7 @@ exports.BattleItems = {
 		},
 		num: 662,
 		gen: 6,
-		desc: "Mega-evolves Mewtwo into Mega Mewtwo X."
+		desc: "If holder is a Mewtwo, this item allows it to Mega Evolve in battle."
 	},
 	"mewtwonitey": {
 		id: "mewtwonitey",
@@ -2675,7 +2860,7 @@ exports.BattleItems = {
 		},
 		num: 663,
 		gen: 6,
-		desc: "Mega-evolves Mewtwo into Mega Mewtwo Y."
+		desc: "If holder is a Mewtwo, this item allows it to Mega Evolve in battle."
 	},
 	"micleberry": {
 		id: "micleberry",
@@ -2712,9 +2897,6 @@ exports.BattleItems = {
 		id: "mindplate",
 		name: "Mind Plate",
 		spritenum: 291,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Psychic',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -2722,9 +2904,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 307,
 		gen: 4,
-		desc: "Holder's Psychic-type attacks have 1.2x power. Judgment is Psychic-type."
+		desc: "Holder's Psychic-type attacks have 1.2x power. Judgment is Psychic type."
 	},
 	"miracleseed": {
 		id: "miracleseed",
@@ -2872,7 +3060,7 @@ exports.BattleItems = {
 			type: "Fire"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Fire' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Fire' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -2882,7 +3070,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 184,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Fire-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Fire-type attack. Single use."
 	},
 	"oddincense": {
 		id: "oddincense",
@@ -2926,12 +3114,15 @@ exports.BattleItems = {
 				pokemon.eatItem();
 			}
 		},
+		onEatItem: function (item, pokemon) {
+			if (!this.runEvent('TryHeal', pokemon)) return false;
+		},
 		onEat: function (pokemon) {
 			this.heal(10);
 		},
 		num: 155,
 		gen: 3,
-		desc: "Restores 10HP when at 1/2 max HP or less. Single use."
+		desc: "Restores 10 HP when at 1/2 max HP or less. Single use."
 	},
 	"pamtreberry": {
 		id: "pamtreberry",
@@ -2964,7 +3155,7 @@ exports.BattleItems = {
 			type: "Water"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Water' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Water' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -2974,7 +3165,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 185,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Water-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Water-type attack. Single use."
 	},
 	"payapaberry": {
 		id: "payapaberry",
@@ -2986,7 +3177,7 @@ exports.BattleItems = {
 			type: "Psychic"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Psychic' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Psychic' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -2996,7 +3187,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 193,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Psychic-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Psychic-type attack. Single use."
 	},
 	"pechaberry": {
 		id: "pechaberry",
@@ -3061,7 +3252,21 @@ exports.BattleItems = {
 		},
 		num: 204,
 		gen: 3,
-		desc: "Raises Sp. Atk by 1 when at 1/4 max HP or less. Single use."
+		desc: "Raises holder's Sp. Atk by 1 stage when at 1/4 max HP or less. Single use."
+	},
+	"pidgeotite": {
+		id: "pidgeotite",
+		name: "Pidgeotite",
+		spritenum: 622,
+		megaStone: "Pidgeot-Mega",
+		megaEvolves: "Pidgeot",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 762,
+		gen: 6,
+		desc: "If holder is a Pidgeot, this item allows it to Mega Evolve in battle."
 	},
 	"pinapberry": {
 		id: "pinapberry",
@@ -3088,15 +3293,12 @@ exports.BattleItems = {
 		},
 		num: 671,
 		gen: 6,
-		desc: "Mega-evolves Pinsir."
+		desc: "If holder is a Pinsir, this item allows it to Mega Evolve in battle."
 	},
 	"pixieplate": {
 		id: "pixieplate",
 		name: "Pixie Plate",
 		spritenum: 610,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Fairy',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -3104,9 +3306,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: -6,
 		gen: 6,
-		desc: "Holder's Fairy-type attacks have 1.2x power. Judgment is Fairy-type."
+		desc: "Holder's Fairy-type attacks have 1.2x power. Judgment is Fairy type."
 	},
 	"plumefossil": {
 		id: "plumefossil",
@@ -3334,7 +3542,7 @@ exports.BattleItems = {
 		},
 		num: 326,
 		gen: 4,
-		desc: "Holder's critical hit ratio is boosted by 1."
+		desc: "Holder's critical hit ratio is raised by 1 stage."
 	},
 	"razorfang": {
 		id: "razorfang",
@@ -3382,7 +3590,7 @@ exports.BattleItems = {
 		},
 		onAfterMoveSecondary: function (target, source, move) {
 			if (source && source !== target && source.hp && target.hp && move && move.category !== 'Status') {
-				if (!source.isActive) return;
+				if (!source.isActive || !this.canSwitch(source.side) || target.forceSwitchFlag) return;
 				if (target.useItem(null, source)) { // This order is correct - the item is used up even against a pokemon with Ingrain or that otherwise can't be forced out
 					if (this.runEvent('DragOut', source, target, move)) {
 						this.dragIn(source.side, source.position);
@@ -3393,6 +3601,31 @@ exports.BattleItems = {
 		num: 542,
 		gen: 5,
 		desc: "If holder is hit, it forces the attacker to switch to a random ally. Single use."
+	},
+	"redorb": {
+		id: "redorb",
+		name: "Red Orb",
+		spritenum: 390,
+		onSwitchInPriority: -6,
+		onSwitchIn: function (pokemon) {
+			if (pokemon.isActive && pokemon.baseTemplate.species === 'Groudon') {
+				var template = this.getTemplate('Groudon-Primal');
+				pokemon.formeChange(template);
+				pokemon.baseTemplate = template;
+				pokemon.details = template.species + (pokemon.level === 100 ? '' : ', L' + pokemon.level) + (pokemon.gender === '' ? '' : ', ' + pokemon.gender) + (pokemon.set.shiny ? ', shiny' : '');
+				this.add('detailschange', pokemon, pokemon.details);
+				this.add('message', pokemon.name + "'s Primal Reversion! It reverted to its primal form!");
+				pokemon.setAbility(template.abilities['0']);
+				pokemon.baseAbility = pokemon.ability;
+			}
+		},
+		onTakeItem: function (item, source) {
+			if (source.baseTemplate.baseSpecies === 'Groudon') return false;
+			return true;
+		},
+		num: -6,
+		gen: 6,
+		desc: "If holder is a Groudon, this item triggers its Primal Reversion in battle."
 	},
 	"repeatball": {
 		id: "repeatball",
@@ -3412,7 +3645,7 @@ exports.BattleItems = {
 			type: "Grass"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Grass' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Grass' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -3422,7 +3655,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 187,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Grass-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Grass-type attack. Single use."
 	},
 	"ringtarget": {
 		id: "ringtarget",
@@ -3436,7 +3669,7 @@ exports.BattleItems = {
 		},
 		num: 543,
 		gen: 5,
-		desc: "Holder's type immunities granted by its own typing are negated."
+		desc: "The holder's type immunities granted solely by its typing are negated."
 	},
 	"rockgem": {
 		id: "rockgem",
@@ -3483,7 +3716,7 @@ exports.BattleItems = {
 		},
 		onAfterDamageOrder: 2,
 		onAfterDamage: function (damage, target, source, move) {
-			if (source && source !== target && move && move.isContact) {
+			if (source && source !== target && move && move.flags['contact']) {
 				this.damage(source.maxhp / 6, source, target, null, true);
 			}
 		},
@@ -3529,7 +3762,7 @@ exports.BattleItems = {
 			type: "Fairy"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Fairy' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Fairy' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -3539,7 +3772,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: -6,
 		gen: 6,
-		desc: "Halves damage taken from a super effective Fairy-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Fairy-type attack. Single use."
 	},
 	"rowapberry": {
 		id: "rowapberry",
@@ -3562,6 +3795,20 @@ exports.BattleItems = {
 		gen: 4,
 		desc: "If holder is hit by a special move, attacker loses 1/8 of its max HP. Single use."
 	},
+	"sablenite": {
+		id: "sablenite",
+		name: "Sablenite",
+		spritenum: 614,
+		megaStone: "Sableye-Mega",
+		megaEvolves: "Sableye",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 754,
+		gen: 6,
+		desc: "If holder is a Sableye, this item allows it to Mega Evolve in battle."
+	},
 	"safariball": {
 		id: "safariball",
 		name: "Safari Ball",
@@ -3574,12 +3821,21 @@ exports.BattleItems = {
 		id: "safetygoggles",
 		name: "Safety Goggles",
 		spritenum: 604,
+		fling: {
+			basePower: 80
+		},
 		onImmunity: function (type, pokemon) {
 			if (type === 'sandstorm' || type === 'hail' || type === 'powder') return false;
 		},
+		onTryHit: function (pokemon, source, move) {
+			if (move.flags['powder'] && move.id !== 'ragepowder') {
+				this.add('-activate', pokemon, 'Safety Goggles', move.name);
+				return null;
+			}
+		},
 		num: -6,
 		gen: 6,
-		desc: "Protects the holder from weather-related damage and powder moves."
+		desc: "Holder is immune to powder moves and damage from Sandstorm or Hail."
 	},
 	"salacberry": {
 		id: "salacberry",
@@ -3600,7 +3856,35 @@ exports.BattleItems = {
 		},
 		num: 203,
 		gen: 3,
-		desc: "Raises Speed by 1 when at 1/4 max HP or less. Single use."
+		desc: "Raises holder's Speed by 1 stage when at 1/4 max HP or less. Single use."
+	},
+	"salamencite": {
+		id: "salamencite",
+		name: "Salamencite",
+		spritenum: 627,
+		megaStone: "Salamence-Mega",
+		megaEvolves: "Salamence",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 769,
+		gen: 6,
+		desc: "If holder is a Salamence, this item allows it to Mega Evolve in battle."
+	},
+	"sceptilite": {
+		id: "sceptilite",
+		name: "Sceptilite",
+		spritenum: 613,
+		megaStone: "Sceptile-Mega",
+		megaEvolves: "Sceptile",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 753,
+		gen: 6,
+		desc: "If holder is a Sceptile, this item allows it to Mega Evolve in battle."
 	},
 	"scizorite": {
 		id: "scizorite",
@@ -3614,7 +3898,7 @@ exports.BattleItems = {
 		},
 		num: 670,
 		gen: 6,
-		desc: "Mega-evolves Scizor."
+		desc: "If holder is a Scizor, this item allows it to Mega Evolve in battle."
 	},
 	"scopelens": {
 		id: "scopelens",
@@ -3628,7 +3912,7 @@ exports.BattleItems = {
 		},
 		num: 232,
 		gen: 2,
-		desc: "Holder's critical hit ratio is boosted by 1."
+		desc: "Holder's critical hit ratio is raised by 1 stage."
 	},
 	"seaincense": {
 		id: "seaincense",
@@ -3664,6 +3948,20 @@ exports.BattleItems = {
 		gen: 2,
 		desc: "Holder's Flying-type attacks have 1.2x power."
 	},
+	"sharpedonite": {
+		id: "sharpedonite",
+		name: "Sharpedonite",
+		spritenum: 619,
+		megaStone: "Sharpedo-Mega",
+		megaEvolves: "Sharpedo",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 759,
+		gen: 6,
+		desc: "If holder is a Sharpedo, this item allows it to Mega Evolve in battle."
+	},
 	"shedshell": {
 		id: "shedshell",
 		name: "Shed Shell",
@@ -3677,7 +3975,7 @@ exports.BattleItems = {
 		},
 		num: 295,
 		gen: 4,
-		desc: "Holder may switch out even when trapped by another Pokemon."
+		desc: "Holder may switch out even when trapped by another Pokemon, or by Ingrain."
 	},
 	"shellbell": {
 		id: "shellbell",
@@ -3687,9 +3985,9 @@ exports.BattleItems = {
 			basePower: 30
 		},
 		onAfterMoveSecondarySelfPriority: -1,
-		onAfterMoveSecondarySelf: function (source, target) {
-			if (source.lastDamage > 0) {
-				this.heal(source.lastDamage / 8, source);
+		onAfterMoveSecondarySelf: function (pokemon, target, move) {
+			if (move.category !== 'Status' && pokemon.lastDamage > 0) {
+				this.heal(pokemon.lastDamage / 8, pokemon);
 			}
 		},
 		num: 253,
@@ -3700,9 +3998,6 @@ exports.BattleItems = {
 		id: "shockdrive",
 		name: "Shock Drive",
 		spritenum: 442,
-		fling: {
-			basePower: 70
-		},
 		onTakeItem: function (item, pokemon, source) {
 			if ((source && source.baseTemplate.num === 649) || pokemon.baseTemplate.num === 649) {
 				return false;
@@ -3712,7 +4007,7 @@ exports.BattleItems = {
 		onDrive: 'Electric',
 		num: 117,
 		gen: 5,
-		desc: "Holder's Techno Blast is Electric-type."
+		desc: "Holder's Techno Blast is Electric type."
 	},
 	"shucaberry": {
 		id: "shucaberry",
@@ -3724,7 +4019,7 @@ exports.BattleItems = {
 			type: "Ground"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Ground' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Ground' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -3734,7 +4029,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 191,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Ground-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Ground-type attack. Single use."
 	},
 	"silkscarf": {
 		id: "silkscarf",
@@ -3784,6 +4079,9 @@ exports.BattleItems = {
 				pokemon.eatItem();
 			}
 		},
+		onEatItem: function (item, pokemon) {
+			if (!this.runEvent('TryHeal', pokemon)) return false;
+		},
 		onEat: function (pokemon) {
 			this.heal(pokemon.maxhp / 4);
 		},
@@ -3806,9 +4104,6 @@ exports.BattleItems = {
 		id: "skyplate",
 		name: "Sky Plate",
 		spritenum: 450,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Flying',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -3816,9 +4111,29 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 306,
 		gen: 4,
-		desc: "Holder's Flying-type attacks have 1.2x power. Judgment is Flying-type."
+		desc: "Holder's Flying-type attacks have 1.2x power. Judgment is Flying type."
+	},
+	"slowbronite": {
+		id: "slowbronite",
+		name: "Slowbronite",
+		spritenum: 620,
+		megaStone: "Slowbro-Mega",
+		megaEvolves: "Slowbro",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 760,
+		gen: 6,
+		desc: "If holder is a Slowbro, this item allows it to Mega Evolve in battle."
 	},
 	"smoothrock": {
 		id: "smoothrock",
@@ -3845,7 +4160,7 @@ exports.BattleItems = {
 		},
 		num: -6,
 		gen: 6,
-		desc: "Raises Attack by 1 if hit by an Ice-type attack. Single use."
+		desc: "Raises holder's Attack by 1 if hit by an Ice-type attack. Single use."
 	},
 	"softsand": {
 		id: "softsand",
@@ -3867,7 +4182,6 @@ exports.BattleItems = {
 	"souldew": {
 		id: "souldew",
 		name: "Soul Dew",
-		isUnreleased: true,
 		spritenum: 459,
 		fling: {
 			basePower: 30
@@ -3922,9 +4236,6 @@ exports.BattleItems = {
 		id: "splashplate",
 		name: "Splash Plate",
 		spritenum: 463,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Water',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -3932,17 +4243,20 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 299,
 		gen: 4,
-		desc: "Holder's Water-type attacks have 1.2x power. Judgment is Water-type."
+		desc: "Holder's Water-type attacks have 1.2x power. Judgment is Water type."
 	},
 	"spookyplate": {
 		id: "spookyplate",
 		name: "Spooky Plate",
 		spritenum: 464,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Ghost',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -3950,9 +4264,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 310,
 		gen: 4,
-		desc: "Holder's Ghost-type attacks have 1.2x power. Judgment is Ghost-type."
+		desc: "Holder's Ghost-type attacks have 1.2x power. Judgment is Ghost type."
 	},
 	"sportball": {
 		id: "sportball",
@@ -3994,6 +4314,20 @@ exports.BattleItems = {
 		gen: 3,
 		desc: "Raises a random stat by 2 when at 1/4 max HP or less (not acc/eva). Single use."
 	},
+	"steelixite": {
+		id: "steelixite",
+		name: "Steelixite",
+		spritenum: 621,
+		megaStone: "Steelix-Mega",
+		megaEvolves: "Steelix",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 761,
+		gen: 6,
+		desc: "If holder is a Steelix, this item allows it to Mega Evolve in battle."
+	},
 	"steelgem": {
 		id: "steelgem",
 		name: "Steel Gem",
@@ -4027,7 +4361,7 @@ exports.BattleItems = {
 		},
 		num: 259,
 		gen: 2,
-		desc: "If holder is a Farfetch'd, its critical hit ratio is boosted by 2."
+		desc: "If holder is a Farfetch'd, its critical hit ratio is raised by 2 stages."
 	},
 	"stickybarb": {
 		id: "stickybarb",
@@ -4042,7 +4376,7 @@ exports.BattleItems = {
 			this.damage(pokemon.maxhp / 8);
 		},
 		onHit: function (target, source, move) {
-			if (source && source !== target && !source.item && move && move.isContact) {
+			if (source && source !== target && !source.item && move && move.flags['contact']) {
 				var barb = target.takeItem();
 				source.setItem(barb);
 				// no message for Sticky Barb changing hands
@@ -4056,9 +4390,6 @@ exports.BattleItems = {
 		id: "stoneplate",
 		name: "Stone Plate",
 		spritenum: 477,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Rock',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -4066,9 +4397,29 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 309,
 		gen: 4,
-		desc: "Holder's Rock-type attacks have 1.2x power. Judgment is Rock-type."
+		desc: "Holder's Rock-type attacks have 1.2x power. Judgment is Rock type."
+	},
+	"swampertite": {
+		id: "swampertite",
+		name: "Swampertite",
+		spritenum: 612,
+		megaStone: "Swampert-Mega",
+		megaEvolves: "Swampert",
+		onTakeItem: function (item, source) {
+			if (item.megaEvolves === source.baseTemplate.baseSpecies) return false;
+			return true;
+		},
+		num: 752,
+		gen: 6,
+		desc: "If holder is a Swampert, this item allows it to Mega Evolve in battle."
 	},
 	"tamatoberry": {
 		id: "tamatoberry",
@@ -4093,7 +4444,7 @@ exports.BattleItems = {
 			type: "Bug"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Bug' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Bug' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -4103,7 +4454,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 194,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Bug-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Bug-type attack. Single use."
 	},
 	"thickclub": {
 		id: "thickclub",
@@ -4151,9 +4502,6 @@ exports.BattleItems = {
 		id: "toxicplate",
 		name: "Toxic Plate",
 		spritenum: 516,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Poison',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -4161,9 +4509,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 304,
 		gen: 4,
-		desc: "Holder's Poison-type attacks have 1.2x power. Judgment is Poison-type."
+		desc: "Holder's Poison-type attacks have 1.2x power. Judgment is Poison type."
 	},
 	"twistedspoon": {
 		id: "twistedspoon",
@@ -4194,7 +4548,7 @@ exports.BattleItems = {
 		},
 		num: 669,
 		gen: 6,
-		desc: "Mega-evolves Tyranitar."
+		desc: "If holder is a Tyranitar, this item allows it to Mega Evolve in battle."
 	},
 	"ultraball": {
 		id: "ultraball",
@@ -4216,7 +4570,7 @@ exports.BattleItems = {
 		},
 		num: 659,
 		gen: 6,
-		desc: "Mega-evolves Venusaur."
+		desc: "If holder is a Venusaur, this item allows it to Mega Evolve in battle."
 	},
 	"wacanberry": {
 		id: "wacanberry",
@@ -4228,7 +4582,7 @@ exports.BattleItems = {
 			type: "Electric"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Electric' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Electric' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -4238,7 +4592,7 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 186,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Electric-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Electric-type attack. Single use."
 	},
 	"watergem": {
 		id: "watergem",
@@ -4297,13 +4651,13 @@ exports.BattleItems = {
 			basePower: 80
 		},
 		onHit: function (target, source, move) {
-			if (target.hp && move.category !== 'Status' && !move.damage && !move.damageCallback && this.getEffectiveness(move, target) > 0 && target.useItem()) {
+			if (target.hp && move.category !== 'Status' && !move.damage && !move.damageCallback && move.typeMod > 0 && target.useItem()) {
 				this.boost({atk: 2, spa: 2});
 			}
 		},
 		num: -6,
 		gen: 6,
-		desc: "Attack and Sp. Atk sharply increase when hit super effectively. Single use."
+		desc: "If holder is hit super effectively, raises Attack, Sp. Atk by 2 stages. Single use."
 	},
 	"wepearberry": {
 		id: "wepearberry",
@@ -4386,6 +4740,9 @@ exports.BattleItems = {
 				pokemon.eatItem();
 			}
 		},
+		onEatItem: function (item, pokemon) {
+			if (!this.runEvent('TryHeal', pokemon)) return false;
+		},
 		onEat: function (pokemon) {
 			this.heal(pokemon.maxhp / 8);
 			if (pokemon.getNature().minus === 'spa') {
@@ -4423,7 +4780,7 @@ exports.BattleItems = {
 			type: "Ice"
 		},
 		onSourceModifyDamage: function (damage, source, target, move) {
-			if (move.type === 'Ice' && this.getEffectiveness(move, target) > 0 && !target.volatiles['substitute']) {
+			if (move.type === 'Ice' && move.typeMod > 0 && !target.volatiles['substitute']) {
 				if (target.eatItem()) {
 					this.debug('-50% reduction');
 					return this.chainModify(0.5);
@@ -4433,15 +4790,12 @@ exports.BattleItems = {
 		onEat: function () { },
 		num: 188,
 		gen: 4,
-		desc: "Halves damage taken from a super effective Ice-type attack. Single use."
+		desc: "Halves damage taken from a supereffective Ice-type attack. Single use."
 	},
 	"zapplate": {
 		id: "zapplate",
 		name: "Zap Plate",
 		spritenum: 572,
-		fling: {
-			basePower: 90
-		},
 		onPlate: 'Electric',
 		onBasePowerPriority: 6,
 		onBasePower: function (basePower, user, target, move) {
@@ -4449,9 +4803,15 @@ exports.BattleItems = {
 				return this.chainModify(1.2);
 			}
 		},
+		onTakeItem: function (item, pokemon, source) {
+			if ((source && source.baseTemplate.num === 493) || pokemon.baseTemplate.num === 493) {
+				return false;
+			}
+			return true;
+		},
 		num: 300,
 		gen: 4,
-		desc: "Holder's Electric-type attacks have 1.2x power. Judgment is Electric-type."
+		desc: "Holder's Electric-type attacks have 1.2x power. Judgment is Electric type."
 	},
 	"zoomlens": {
 		id: "zoomlens",

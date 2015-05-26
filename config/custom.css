@@ -1,16 +1,66 @@
-/* Header */
-#header {
-    background: url(http://i.imgur.com/XkjakIM.png);
+/*Header*/
+#header{
+background:url("http://www.lonuevodehoy.com/wp-content/uploads/2012/10/fondo-negro.jpg")
 }
 
-/*main background layout */
+/*Main BG*/
 body {
-    background: url(http://i.imgur.com/vGKr4CV.png) !important;
+background-image:url('http://fc09.deviantart.net/fs70/i/2013/044/9/2/the_legendary_meeting_fullhd_by_dekus-d5utauu.png');
+background-repeat:no-repeat;
+background-position:center fixed;
 }
 
-/*main image */
-.mainmenuwrapper {
-    background: url(http://i.imgur.com/5wE1shI.png) no-repeat right !important;
+/*PM Box*/
+.pm-log {
+min-height: 100px;
+max-height: 300px;
+background: url() center top scroll;
+color: #ffffff;
+word-wrap: break-word;
+overflow: auto;
+border: 0px solid #000000;
+border-top-left-radius: 0px;
+border-top-right-radius: 0px;
+}
+.pm-window h3 {
+    background: #181616;
+   border: 2px;
+}
+.pm-window.focused h3, .pm-window.focused h3:hover {
+background: #cbc8c8;
+border: 2px;
+}
+.pm-log-add {
+        background: #404040;
+   border: 2px;
+     border-color: #000;
+}
+
+/* Chat-log */
+.chat-log {
+    background: url("http://i.imgur.com/fUIKhpT.png");
+}
+
+.chat-log-add {
+    border-top: 1px solid #000;
+    background: #E6E6E6;
+}
+
+.-log-add {
+    border-top: 1px solid #000;
+    background: #E6E6E6;
+}
+
+/*"Look for a battle" buttons (when hovered over)*/
+.menugroup .button:hover {
+    background: #3b3b3b;
+   color: #fff
+}
+
+/*"Look for a battle" buttons*/
+.menugroup .button {
+     background: #000;
+   color: #fff
 }
 
 /* Tabbar rooms */
@@ -29,6 +79,36 @@ body {
     border: solid 1px #000000;
 }
 
+.userlist {
+  background: #cccccc;
+  color: #fff;
+  border: 1px solid;
+}
+
+.tabbar a.button.cur,.tabbar a.button.cur:hover {
+color: #3b3b3b;
+text-shadow:none;
+   border: 2px;
+background: #cccccc;
+cursor: default;
+}
+
+.tabbar a.button {
+background: #3b3b3b;
+color: #cccccc;
+}
+
+.char {
+background: url(http://fc09.deviantart.net/fs71/f/2012/275/7/7/black_and_grey_stripe_pattern_by_wiizkiid-d5gm6uv.png) center;
+color: #eff;
+}
+
+/* Announce */
+.message-announce {
+    background: #4F3F5A;
+    font-style: italic;
+}
+
 /* Close and minimize button */
 .closebutton, .minimizebutton {
     color: #9187BB;
@@ -36,85 +116,6 @@ body {
 
 .closebutton:hover, .minimizebutton:hover {
     color: rgb(216, 205, 205);
-}
-
-/* Icon user */
-.icon-user {
-    color: #5F587A !important;
-}
-
-/* Menu */
-.menugroup {
-    border: 1px dotted #000;
-}
-
-.menugroup button.big {
-    font-size: 10pt;
-}
-
-.menugroup .button {
-    background: #49404E;
-    border: solid 1px #000;
-    color: #fff;
-    border-color: hsl(0, 0%, 0%);
-    font-size: 8pt;
-}
-
-.menugroup .button:hover {
-    background: rgb(117, 101, 124);
-}
-
-/* Footer links */
-.mainmenufooter {
-    color: #fff;
-}
-
-.mainmenufooter a {
-    text-decoration: none;
-    color: #B29CB4;
-}
-
-.mainmenufooter a:hover {
-    text-decoration: none;
-    color: #fff;
-}
-
-/* Userlist */
-.userlist {
-    border-right: 1px solid #000;
-    background: rgba(230, 230, 230, 0.8);
-}
-
-.userlist li {
-    border-bottom: 1px dotted #A3A3A3;
-}
-
-.userlist li button:hover {
-    background: #fafafa;
-}
-
-.ps-room {
-    border: 0;
-}
-
-.userlist li em.group {
-    color: #000;
-}
-
-/* Chat-log */
-.chat-log {
-    background: url("http://i.imgur.com/fUIKhpT.png");
-}
-
-.chat-log-add {
-    border-top: 1px solid #000;
-    background: #E6E6E6;
-}
-
-/* Announce */
-.message-announce {
-    background: #4F3F5A;
-    font-style: italic;
 }
 
 /* Declare Color */
@@ -144,56 +145,10 @@ body {
     font-family: Futura, "Trebuchet MS", Arial, sans-serif;
     font-size: 10pt;
 }
-
-/* PM Messages */
-.pm-window h3 {
-    background: rgba(68, 49, 70, 0.9);
-    color: #fff;
-    border: 1px solid #000000;
-}
-
-.pm-window h3:hover {
-    color: #FFE5FE;
-}
-
-.pm-log-add {
-    border: 1px solid #000000;
-    background: rgba(68, 49, 70, 0.9);
-}
-
-.pm-window.focused h3, .pm-window.focused h3:hover {
-    color: #463949;
-    background: #baa7bf;
-    border: 1px solid #000;
-}
-
-/* Popup */
-.ps-popup {
-    border: 2px solid #000000;
-    background: #F5F5F5;
-}
-
-.ps-popup a {
-    color: rgb(107, 32, 32);
-    text-decoration: none;
-}
-
-.ps-popup a:hover {
-    color: rgb(224, 0, 0);
-    text-decoration: none;
-}
-
 /* Battle Background */
 .backdrop {
     background: url(http://i.imgur.com/g8C3QlK.png) !important;
 }
-
-/* Infobox */
-.infobox {
-    border: 1px dotted #6688AA;
-    padding: 5px;
-}
-
 /* Roomlist */
 .roomlist a.ilink {
     border: 0;
@@ -207,39 +162,9 @@ body {
     border: 0;
     color: #fff;
 }
-
-/* Welcome Message */
-.welcome, .clans-info, .clan-info {
-    background: url(http://i.imgur.com/3lBSg3c.png) center repeat-y;
-    color: #fff;
-    margin-top: -3px;
-    padding: 1px 15px;
-    width: 440px;
-}
-
-.welcome hr, .clans-info hr, .clan-info hr{
-    border: 1px dashed #fff;
-}
-
-.welcome button, .clans-info button, .clan-info button {
-    background: rgb(87, 87, 129);
-    color: #fff;
-    border: 1px solid #fff;
-    font-size: 10pt;
-    padding: 5px;
-}
-
-.welcome button:hover, .clans-info button:hover, .clan-info button:hover {
-    background: rgb(33, 37, 66);
-}
-
-.welcome .ilink, .clans-info .ilink, .clan-info .ilink {
-    color: #8cf;
-}
-
 /* Liga */
 .league {
-    background: url("http://i.imgur.com/j3gPbd8.png") center repeat-y;
+    background: url("http://fondopantalla.com.es/download/730/1920x1080/crop/fondo-minimalista-negro.jpg") center repeat-y;
     color: #fff;
     margin-top: -3px;
     padding: 1px 15px;
@@ -255,7 +180,7 @@ body {
 .league button, .lideres td {
     border: 0;
     color: #fff;
-    background: rgb(134, 119, 96);
+    background: rgb(104, 103, 100);
     padding: 5px;
     font-weight: bold;
 }
@@ -275,7 +200,7 @@ body {
 }
 
 .league ul {
-	text-align: left;
+  text-align: left;
 }
 
 .alto-mando {
@@ -293,6 +218,57 @@ body {
     margin-top: 3px;
     border-left: 1px solid #fff;
     text-align: center;
+}
+
+/* Icon user */
+.icon-user {
+    color: #5F587A !important;
+}
+
+/* Footer links */
+.mainmenufooter {
+    color: #fff;
+}
+
+.mainmenufooter a {
+    text-decoration: none;
+    color: #B29CB4;
+}
+
+.mainmenufooter a:hover {
+    text-decoration: none;
+    color: #fff;
+}
+
+/* Popup */
+.ps-popup {
+    border: 2px solid #000000;
+    background: #F5F5F5;
+}
+
+.ps-popup a {
+    color: rgb(107, 32, 32);
+    text-decoration: none;
+}
+
+.ps-popup a:hover {
+    color: rgb(224, 0, 0);
+    text-decoration: none;
+}
+
+/* Infobox */
+.infobox {
+    border: 1px dotted #6688AA;
+    padding: 5px;
+}
+
+/* Welcome Message */
+.welcome {
+    background: url(http://orig00.deviantart.net/2799/f/2015/135/0/8/sin_t__tulo_b1_by_somnifero-d8th6gk.png) center repeat-y;
+    color: #fff;
+    margin-top: -3px;
+    padding: 1px 15px;
+    width: 440px;
 }
 
 /* Tienda */
@@ -323,3 +299,5 @@ body {
 .shop button:hover {
 	background: rgb(114, 148, 147);
 }
+
+

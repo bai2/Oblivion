@@ -10,13 +10,13 @@
  *
  * @license MIT license
  */
+/* jscs:disable validateIndentation */
 
 //var cluster = require('cluster');
 global.Config = require('./config/config');
 var fakeProcess = new (require('./fake-process').FakeProcess)();
 
 /*if (cluster.isMaster) {
-
 	cluster.setupMaster({
 		exec: 'sockets.js'
 	});*/
@@ -114,11 +114,11 @@ var fakeProcess = new (require('./fake-process').FakeProcess)();
 	exports.subchannelMove = function (worker, channelid, subchannelid, socketid) {
 		worker.send('.' + channelid + '\n' + subchannelid + '\n' + socketid);
 	};
-
 //} else {
 	// is worker
 
 	if (process.env.PSPORT) Config.port = +process.env.PSPORT;
+	if (process.env.PSBINDADDR) Config.bindAddress = process.env.PSBINDADDR;
 
 	// ofe is optional
 	// if installed, it will heap dump if the process runs out of memory
@@ -420,8 +420,8 @@ var fakeProcess = new (require('./fake-process').FakeProcess)();
 		});
 	});
 	server.installHandlers(app, {});
-	app.listen(Config.port);
-	console.log('Worker ' /*+ cluster.worker.id*/ + ' now listening on port ' + Config.port);
+	app.listen(Config.port, Config.bindAddress || undefined);
+	console.log('Worker ' /*+ cluster.worker.id*/ + ' now listening on ' + (Config.bindAddress || '*') + ':' + Config.port);
 
 	if (appssl) {
 		server.installHandlers(appssl, {});
@@ -429,6 +429,7 @@ var fakeProcess = new (require('./fake-process').FakeProcess)();
 		console.log('Worker ' /*+ cluster.worker.id*/ + ' now listening for SSL on port ' + Config.ssl.port);
 	}
 
-	console.log('Test your server at http://localhost:' + Config.port);
+	console.log('Test your server at http://' + (Config.bindAddress || 'localhost') + ':' + Config.port);
 
+	require('./repl.js').start('sockets-', /*cluster.worker.id + '-' +*/ process.pid, function (cmd) { return eval(cmd); });
 //}

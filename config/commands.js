@@ -172,7 +172,7 @@ var commands = exports.commands = {
 			return this.sendReply("User " + this.targetUsername + " not found.");
 		}
 
-		this.sendReply("User: " + targetUser.name);
+		this.sendReply("|raw|User: " + targetUser.name + (!targetUser.connected ? ' <font color="gray"><em>(offline)</em></font>' : ''));
 		if (user.can('alts', targetUser)) {
 			var alts = targetUser.getAlts(true);
 			var output = Object.keys(targetUser.prevNames).join(", ");
@@ -184,12 +184,24 @@ var commands = exports.commands = {
 				if (Config.groups.bySymbol[targetAlt.group] && Config.groups.bySymbol[user.group] &&
 					Config.groups.bySymbol[targetAlt.group].rank > Config.groups.bySymbol[user.group].rank) continue;
 
-				this.sendReply("Alt: " + targetAlt.name);
+				this.sendReply("|raw|Alt: " + targetAlt.name + (!targetAlt.connected ? ' <font color="gray"><em>(offline)</em></font>' : ''));
 				output = Object.keys(targetAlt.prevNames).join(", ");
 				if (output) this.sendReply("Previous names: " + output);
 			}
 			if (targetUser.locked) {
-				this.sendReply("Locked under the username: " + targetUser.locked);
+				switch (targetUser.locked) {
+				case '#dnsbl':
+					this.sendReply("Locked: IP is in a DNS-based blacklist. ");
+					break;
+				case '#range':
+					this.sendReply("Locked: host is in a temporary range-lock.");
+					break;
+				case '#hostfilter':
+					this.sendReply("Locked: host is permanently locked for being a proxy.");
+					break;
+				default:
+					this.sendReply("Locked under the username: " + targetUser.locked);
+				}
 			}
 		}
 		if (Config.groups.bySymbol[targetUser.group] && Config.groups.bySymbol[targetUser.group].name) {
@@ -201,7 +213,7 @@ var commands = exports.commands = {
 		if (!targetUser.authenticated) {
 			this.sendReply("(Unregistered)");
 		}
-		if (!this.broadcasting && (user.can('ip', targetUser) || user === targetUser)) {
+		if (user.can('ip', targetUser) || user === targetUser) {
 			var ips = Object.keys(targetUser.ips);
 			this.sendReply("IP" + ((ips.length > 1) ? "s" : "") + ": " + ips.join(", "));
 			this.sendReply("Host: " + targetUser.latestHost);
@@ -209,11 +221,12 @@ var commands = exports.commands = {
 		var output = "In rooms: ";
 		var first = true;
 		for (var i in targetUser.roomCount) {
-			if (i === 'global' || Rooms.get(i).isPrivate) continue;
+			var targetRoom = Rooms.get(i);
+			if (i === 'global' || targetRoom.isPrivate) continue;
 			if (!first) output += " | ";
 			first = false;
 
-			output += '<a href="/' + i + '" room="' + i + '">' + i + '</a>';
+			output += (targetRoom.auth && targetRoom.auth[targetUser.userid] ? targetRoom.auth[targetUser.userid] : '') + '<a href="/' + i + '" room="' + i + '">' + i + '</a>';
 		}
 		this.sendReply('|raw|' + output);
 	},
@@ -264,19 +277,19 @@ var commands = exports.commands = {
 		var path = 'http://pokemon-hispano.comxa.com/showthread.php?tid=';
 		return this.sendReply('|raw|' +
 			"<center>" +
-				"<img src=\"http://i.imgur.com/SU0aFTt.png\" />" +
+				"<img src=\"http://i.imgur.com/401KWkJ.jpg?1\" />" +
 				"<div class=\"league\">" +
-					"<h4>CAMPEÓN DE LA LIGA POKÉMON HISPANO</h4>" +
+					"<h4>CAMPEÓN DE LA LIGA OBLIVION</h4>" +
 					"<p>N/A</p>" +
 					"<hr />" +
 					"<div class=\"alto-mando\">" +
 						"<a href=" + path + 623 + "><button>ALTO MANDO</button></a>" +
 						"<ul>" +
-							"<li>(LoD)Tyrana: Dragon</li>" +
-							"<li>Shiny Giratina-O: Agua</li>" +
-							"<li>Based God: Sunny</li>" +
-							"<li>Riuoker-: Psiquico</li>" +
-							"<li>(LoD)Marcos: Acero</li>" +
+							"<li>Pendiente: Dragon</li>" +
+							"<li>Pendiente: Agua</li>" +
+							"<li>Pendiente: Fuego</li>" +
+							"<li>Pendiente: Psiquico</li>" +
+							"<li>Pendiente: Acero</li>" +
 						"</ul>" +
 					"</div>" +
 					"<hr />" +
@@ -284,40 +297,40 @@ var commands = exports.commands = {
 						"<h4>LÍDERES DE GIMNASIOS</h4>" +
 							"<table>" +
 								"<tr>" +
-									"<td><a href=" + path + 628 + ">FC CAMULOS: Normal</a></td>" +
-									"<td><a href=" + path + 637 + ">FC JOMA: Hielo</a></td>" +
-									"<td><a href=" + path + 629 + ">FC ADRIELANDRO: Agua</a></td>" +
+									"<td><a href=" + path + 628 + ">Próximamente: Normal</a></td>" +
+									"<td><a href=" + path + 637 + ">Próximamente: Hielo</a></td>" +
+									"<td><a href=" + path + 629 + ">Próximamente: Agua</a></td>" +
 								"</tr>" +
 								"<tr>" +
-									"<td><a href=" + path + 563 + ">(ABT) Ryuga: Lucha</a></td>" +
-									"<td><a href=" + path + 648 + ">AlyssaSoraya: Bicho</a></td>" +
-									"<td><a href=" + path + 000 + ">Disponible: Roca</a></td>" +
+									"<td><a href=" + path + 563 + ">Próximamente: Lucha</a></td>" +
+									"<td><a href=" + path + 648 + ">Próximamente: Bicho</a></td>" +
+									"<td><a href=" + path + 000 + ">Próximamente: Roca</a></td>" +
 								"</tr>" +
 								"<tr>" +
-									"<td><a href=" + path + 000 + ">Disponible: Hada</a></td>" +
-									"<td><a href=" + path + 570 + ">Miranda L.: Volador</a></td>" +
-									"<td><a href=" + path + 633 + ">davidness: Fantasma</a></td>" +
+									"<td><a href=" + path + 000 + ">Próximamente: Hada</a></td>" +
+									"<td><a href=" + path + 570 + ">Próximamente: Volador</a></td>" +
+									"<td><a href=" + path + 633 + ">Próximamente: Fantasma</a></td>" +
 								"</tr>" +
 								"<tr>" +
-									"<td><a href=" + path + 539 + ">Sidaaaaa: Tierra</a></td>" +
-									"<td><a href=" + path + 647 + "knight of war: Siniestro</a></td>" +
-									"<td><a href=" + path + 000 + ">Disponible: Veneno</a></td>" +
+									"<td><a href=" + path + 539 + ">Próximamente: Tierra</a></td>" +
+									"<td><a href=" + path + 647 + ">Próximamente: Siniestro</a></td>" +
+									"<td><a href=" + path + 000 + ">BlackArien: Veneno</a></td>" +
 								"</tr>" +
 								"<tr>" +
-									"<td><a href=" + path + 000 + ">Disponible: Fuego</a></td>" +
-									"<td><a href=" + path + 000 + ">Kruzes: Eléctrico</a></td>" +
-									"<td><a href=" + path + 000 + ">Disponible: Dragón</a></td>" +
+									"<td><a href=" + path + 000 + ">Próximamente: Fuego</a></td>" +
+									"<td><a href=" + path + 000 + ">Próximamente: Eléctrico</a></td>" +
+									"<td><a href=" + path + 000 + ">Próximamente: Dragón</a></td>" +
 								"</tr>" +
 							"</table>" +
 					"</div>" +
 					"<hr />" +
 					"<ul>" +
 						"<li><a href=\"http://pokemon-hispano.comxa.com/showthread.php?tid=529/\">Cómo desafiar la liga.</a></li>" +
-						"<li><a href=\"http://www.pokemon-hispano.comxa.com/showthread.php?tid=626/\">Información detallada sobre la Liga Pokémon Hispano.</a></li>" +
+						"<li><a href=\"http://www.pokemon-hispano.comxa.com/showthread.php?tid=626/\">Información detallada sobre la Liga Oblivion.</a></li>" +
 					"</ul>" +
 					"<h3>Battle Sages Approaching....</h3>" +
 				"</div>" +
-				"<img src=\"http://i.imgur.com/zqidpf4.png\" />" +
+				"<img src=\"http://i.imgur.com/401KWkJ.jpg?1\" />" +
 			"</center>"
 		);
 	},
@@ -573,11 +586,11 @@ var commands = exports.commands = {
 		if (!this.targetUser) {
 			return this.sendReply("User " + this.targetUsername + " not found.");
 		}
-		var roomid = (target || room.id);
-		if (!Rooms.get(roomid)) {
-			return this.sendReply("Room " + roomid + " not found.");
+		var targetRoom = (target ? Rooms.search(target) : room);
+		if (!targetRoom) {
+			return this.sendReply("Room " + target + " not found.");
 		}
-		return this.parse('/msg ' + this.targetUsername + ', /invite ' + roomid);
+		return this.parse('/msg ' + this.targetUsername + ', /invite ' + targetRoom.id);
 	},
 
 	/*********************************************************
@@ -598,7 +611,7 @@ var commands = exports.commands = {
 		if (targetId === '' + parseInt(targetId)) {
 			for (var p in Tools.data.Pokedex) {
 				var pokemon = Tools.getTemplate(p);
-				if (pokemon.num == parseInt(target)) {
+				if (pokemon.num === parseInt(target)) {
 					target = pokemon.species;
 					targetId = pokemon.id;
 					break;
@@ -660,7 +673,6 @@ var commands = exports.commands = {
 						return evo.name + " (" + evo.evoLevel + ")";
 					}).join(", ");
 				}
-
 			} else if (newTargets[0].searchType === 'move') {
 				var move = Tools.getMove(newTargets[0].name);
 				details = {
@@ -684,7 +696,6 @@ var commands = exports.commands = {
 					'any': "Any Pokemon",
 					'all': "All Pokemon"
 				}[move.target] || "Unknown";
-
 			} else if (newTargets[0].searchType === 'item') {
 				var item = Tools.getItem(newTargets[0].name);
 				details = {};
@@ -701,7 +712,6 @@ var commands = exports.commands = {
 					details["Natural Gift Type"] = item.naturalGift.type;
 					details["Natural Gift BP"] = item.naturalGift.basePower;
 				}
-
 			} else {
 				details = {};
 			}
@@ -721,11 +731,11 @@ var commands = exports.commands = {
 		if (!target) return this.parse('/help dexsearch');
 		var targets = target.split(',');
 		var searches = {};
-		var allTiers = {'uber':1, 'ou':1, 'uu':1, 'lc':1, 'cap':1, 'bl':1, 'bl2':1, 'ru':1, 'bl3':1, 'nu':1, 'pu':1};
+		var allTiers = {'uber':1, 'ou':1, 'uu':1, 'lc':1, 'cap':1, 'bl':1, 'bl2':1, 'ru':1, 'bl3':1, 'nu':1, 'pu':1, 'nfe':1};
 		var allColours = {'green':1, 'red':1, 'blue':1, 'white':1, 'brown':1, 'yellow':1, 'purple':1, 'pink':1, 'gray':1, 'black':1};
 		var showAll = false;
 		var megaSearch = null;
-		var feSearch = null; // search for fully evolved pokemon only
+		var recoverySearch = null;
 		var output = 10;
 
 		for (var i in targets) {
@@ -781,10 +791,10 @@ var commands = exports.commands = {
 				continue;
 			}
 
-			if (target === 'fe' || target === 'fullyevolved' || target === 'nfe' || target === 'notfullyevolved') {
-				if (target === 'nfe' || target === 'notfullyevolved') isNotSearch = !isNotSearch;
-				if ((feSearch && isNotSearch) || (feSearch === false && !isNotSearch)) return this.sendReplyBox('A search cannot both exclude and include fully evolved Pokémon.');
-				feSearch = !isNotSearch;
+			if (target === 'recovery') {
+				if ((recoverySearch && isNotSearch) || (recoverySearch === false && !isNotSearch)) return this.sendReplyBox('A search cannot both exclude and recovery moves.');
+				if (!searches['recovery']) searches['recovery'] = {};
+				recoverySearch = !isNotSearch;
 				continue;
 			}
 
@@ -810,20 +820,19 @@ var commands = exports.commands = {
 			return this.sendReplyBox("'" + Tools.escapeHTML(target) + "' could not be found in any of the search categories.");
 		}
 
-		if (showAll && Object.size(searches) === 0 && megaSearch === null && feSearch === null) return this.sendReplyBox("No search parameters other than 'all' were found. Try '/help dexsearch' for more information on this command.");
+		if (showAll && Object.size(searches) === 0 && megaSearch === null) return this.sendReplyBox("No search parameters other than 'all' were found. Try '/help dexsearch' for more information on this command.");
 
 		var dex = {};
 		for (var pokemon in Tools.data.Pokedex) {
 			var template = Tools.getTemplate(pokemon);
 			var megaSearchResult = (megaSearch === null || (megaSearch === true && template.isMega) || (megaSearch === false && !template.isMega));
-			var feSearchResult = (feSearch === null || (feSearch === true && !template.evos.length) || (feSearch === false && template.evos.length));
 			if (template.tier !== 'Unreleased' && template.tier !== 'Illegal' && (template.tier !== 'CAP' || (searches['tier'] && searches['tier']['cap'])) &&
-				megaSearchResult && feSearchResult) {
+				megaSearchResult) {
 				dex[pokemon] = template;
 			}
 		}
 
-		for (var search in {'moves':1, 'types':1, 'ability':1, 'tier':1, 'gen':1, 'color':1}) {
+		for (var search in {'moves':1, 'recovery':1, 'types':1, 'ability':1, 'tier':1, 'gen':1, 'color':1}) {
 			if (!searches[search]) continue;
 			switch (search) {
 				case 'types':
@@ -859,7 +868,8 @@ var commands = exports.commands = {
 					for (var mon in dex) {
 						if (searches[search][String(dex[mon][search]).toLowerCase()] === false) {
 							delete dex[mon];
-						} else if (Object.count(searches[search], true) > 0 && !searches[search][String(dex[mon][search]).toLowerCase()]) delete dex[mon];					}
+						} else if (Object.count(searches[search], true) > 0 && !searches[search][String(dex[mon][search]).toLowerCase()]) delete dex[mon];
+					}
 					break;
 
 				case 'ability':
@@ -890,6 +900,25 @@ var commands = exports.commands = {
 							var canLearn = (prevoTemp.learnset.sketch && !(move.id in {'chatter':1, 'struggle':1, 'magikarpsrevenge':1})) || prevoTemp.learnset[move.id];
 							if ((!canLearn && searches[search][i]) || (searches[search][i] === false && canLearn)) delete dex[mon];
 						}
+					}
+					break;
+
+				case 'recovery':
+					for (var mon in dex) {
+						var template = Tools.getTemplate(dex[mon].id);
+						if (!template.learnset) template = Tools.getTemplate(template.baseSpecies);
+						if (!template.learnset) continue;
+						var recoveryMoves = ["recover", "roost", "moonlight", "morningsun", "synthesis", "milkdrink", "slackoff", "softboiled", "wish", "healorder"];
+						var canLearn = false;
+						for (var i = 0; i < recoveryMoves.length; i++) {
+							var prevoTemp = Tools.getTemplate(template.id);
+							while (prevoTemp.prevo && prevoTemp.learnset && !(prevoTemp.learnset[recoveryMoves[i]])) {
+								prevoTemp = Tools.getTemplate(prevoTemp.prevo);
+							}
+							canLearn = (prevoTemp.learnset.sketch) || prevoTemp.learnset[recoveryMoves[i]];
+							if (canLearn) break;
+						}
+						if ((!canLearn && searches[search]) || (searches[search] === false && canLearn)) delete dex[mon];
 					}
 					break;
 
@@ -989,7 +1018,7 @@ var commands = exports.commands = {
 
 	weak: 'weakness',
 	resist: 'weakness',
-	weakness: function (target, room, user){
+	weakness: function (target, room, user) {
 		if (!this.canBroadcast()) return;
 		var targets = target.split(/[ ,\/]/);
 
@@ -1090,11 +1119,15 @@ var commands = exports.commands = {
 
 		var factor = 0;
 		if (Tools.getImmunity(source.type || source, defender)) {
+			var totalTypeMod = 0;
 			if (source.effectType !== 'Move' || source.basePower || source.basePowerCallback) {
-				factor = Math.pow(2, Tools.getEffectiveness(source, defender));
-			} else {
-				factor = 1;
+				for (var i = 0; i < defender.types.length; i++) {
+					var baseMod = Tools.getEffectiveness(source, defender.types[i]);
+					var moveMod = source.onEffectiveness && source.onEffectiveness.call(Tools, baseMod, defender.types[i], source);
+					totalTypeMod += typeof moveMod === 'number' ? moveMod : baseMod;
+				}
 			}
+			factor = Math.pow(2, totalTypeMod);
 		}
 
 		this.sendReplyBox("" + atkName + " is " + factor + "x effective against " + defName + ".");
@@ -1137,8 +1170,8 @@ var commands = exports.commands = {
 	},
 
 	staff: function (target, room, user) {
-	    if (!this.canBroadcast()) return;
-	    this.sendReplyBox("<a href=\"https://www.smogon.com/sim/staff_list\">Pokemon Showdown Staff List</a>");
+		if (!this.canBroadcast()) return;
+		this.sendReplyBox("<a href=\"https://www.smogon.com/sim/staff_list\">Pokemon Showdown Staff List</a>");
 	},
 
 	avatars: function (target, room, user) {
@@ -1150,10 +1183,20 @@ var commands = exports.commands = {
 		if (room.id !== 'showderp') return this.sendReply("The command '/showtan' was unrecognized. To send a message starting with '/showtan', type '//showtan'.");
 		if (!this.can('showtan', room)) return;
 		target = this.splitTarget(target);
-		if (!this.targetUser) return this.sendReply('user not found');
-		if (!room.users[this.targetUser.userid]) return this.sendReply('not a showderper');
+		if (!this.targetUser) return this.sendReply("User not found");
+		if (!room.users[this.targetUser.userid]) return this.sendReply("Not a showderper");
 		this.targetUser.avatar = '#showtan';
-		room.add(user.name+' applied showtan to affected area of '+this.targetUser.name);
+		room.add("" + user.name + " applied showtan to affected area of " + this.targetUser.name);
+	},
+
+	cpgtan: function (target, room, user) {
+		if (room.id !== 'cpg') return this.sendReply("The command '/cpgtan' was unrecognized. To send a message starting with '/cpgtan', type '//cpgtan'.");
+		if (!this.can('cpgtan', room)) return;
+		target = this.splitTarget(target);
+		if (!this.targetUser) return this.sendReply("User not found");
+		if (!room.users[this.targetUser.userid]) return this.sendReply("Not a cpger");
+		this.targetUser.avatar = '#cpgtan';
+		room.add("" + user.name + " applied cpgtan to affected area of " + this.targetUser.name);
 	},
 
 	introduction: 'intro',
@@ -1196,8 +1239,8 @@ var commands = exports.commands = {
 			"An introduction to the Create-A-Pokemon project:<br />" +
 			"- <a href=\"https://www.smogon.com/cap/\">CAP project website and description</a><br />" +
 			"- <a href=\"https://www.smogon.com/forums/showthread.php?t=48782\">What Pokemon have been made?</a><br />" +
-			"- <a href=\"https://www.smogon.com/forums/showthread.php?t=3464513\">Talk about the metagame here</a><br />" +
-			"- <a href=\"https://www.smogon.com/forums/showthread.php?t=3466826\">Practice BW CAP teams</a>"
+			"- <a href=\"https://www.smogon.com/forums/forums/311\">Talk about the metagame here</a><br />" +
+			"- <a href=\"https://www.smogon.com/forums/threads/3512318/#post-5594694\">Sample XY CAP teams</a>"
 		);
 	},
 
@@ -1236,16 +1279,14 @@ var commands = exports.commands = {
 			matched = true;
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3481155/\">OM of the Month</a><br />";
 		}
-		if (target === 'pokemonthrowback' || target === 'throwback') {
+		if (target === 'seasonal') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3510401/\">Pokémon Throwback</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3491902/\">Seasonal Ladder</a><br />";
 		}
 		if (target === 'balancedhackmons' || target === 'bh') {
 			matched = true;
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3489849/\">Balanced Hackmons</a><br />";
-			if (target !== 'all') {
-				buffer += "- <a href=\"https://www.smogon.com/forums/threads/3499973/\">Balanced Hackmons Mentoring Program</a><br />";
-			}
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3515725/\">Balanced Hackmons Suspect Discussion</a><br />";
 		}
 		if (target === '1v1') {
 			matched = true;
@@ -1254,43 +1295,35 @@ var commands = exports.commands = {
 		if (target === 'monotype') {
 			matched = true;
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3493087/\">Monotype</a><br />";
-			if (target !== 'all') {
-				buffer += "- <a href=\"https://www.smogon.com/forums/threads/3507565/\">Monotype Viability Rankings</a><br />";
-			}
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3517737/\">Monotype Viability Rankings</a><br />";
 		}
 		if (target === 'tiershift' || target === 'ts') {
 			matched = true;
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3508369/\">Tier Shift</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3514386/\">Tier Shift Viability Rankings</a><br />";
 		}
 		if (target === 'pu') {
 			matched = true;
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3513882/\">PU</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3517353/\">PU Viability Rankings</a><br />";
 		}
-		if (target === 'lcuu') {
+		if (target === 'inversebattle' || target === 'inverse') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3516967/\">LC UU</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3518146/\">Inverse Battle</a><br />";
 		}
 		if (target === 'almostanyability' || target === 'aaa') {
 			matched = true;
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3517022/\">Almost Any Ability</a><br />";
-			if (target !== 'all') {
-				buffer += "- <a href=\"https://www.smogon.com/forums/threads/3508794/\">Almost Any Ability Viability Rankings</a><br />";
-			}
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3508794/\">Almost Any Ability Viability Rankings</a><br />";
 		}
 		if (target === 'stabmons') {
 			matched = true;
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3493081/\">STABmons</a><br />";
-			if (target !== 'all') {
-				buffer += "- <a href=\"https://www.smogon.com/forums/threads/3512215/\">STABmons Viability Rankings</a><br />";
-			}
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3512215/\">STABmons Viability Rankings</a><br />";
 		}
-		if (target === 'skybattles' || target === 'skybattle') {
+		if (target === 'lcuu') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3493601/\">Sky Battles</a><br />";
-		}
-		if (target === 'inversebattle' || target === 'inverse') {
-			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3492433/\">Inverse Battle</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3516967/\">LC UU</a><br />";
 		}
 		if (target === '350cup') {
 			matched = true;
@@ -1300,25 +1333,21 @@ var commands = exports.commands = {
 			matched = true;
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3495527/\">Averagemons</a><br />";
 		}
-		if (target === 'hackmons' || target === 'purehackmons' || target === 'classichackmons') {
+		if (target === 'classichackmons' || target === 'hackmons') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3500418/\">Hackmons</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3521887/\">Classic Hackmons</a><br />";
 		}
-		if (target === 'mediocremons') {
+		if (target === 'hiddentype') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3507608/\">Mediocremons</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3516349/\">Hidden Type</a><br />";
 		}
 		if (target === 'middlecup' || target === 'mc') {
 			matched = true;
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3494887/\">Middle Cup</a><br />";
 		}
-		if (target === 'mashup') {
+		if (target === 'skybattle') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3515232/\">OM Mashup</a><br />";
-		}
-		if (target === 'glitchmons') {
-			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3467120/\">Glitchmons</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3493601/\">Sky Battle</a><br />";
 		}
 		if (!matched) {
 			return this.sendReply("The Other Metas entry '" + target + "' was not found. Try /othermetas or /om for general help.");
@@ -1415,8 +1444,8 @@ var commands = exports.commands = {
 			return;
 		}
 		if (!this.can('declare', room)) return;
-		if (target.length > 80) {
-			return this.sendReply("Error: Room rules link is too long (must be under 80 characters). You can use a URL shortener to shorten the link.");
+		if (target.length > 100) {
+			return this.sendReply("Error: Room rules link is too long (must be under 100 characters). You can use a URL shortener to shorten the link.");
 		}
 
 		room.rulesLink = target.trim();
@@ -1455,7 +1484,7 @@ var commands = exports.commands = {
 		}
 		if (target === 'all' || target === 'star' || target === 'player') {
 			matched = true;
-			buffer += '<a href="http://www.smogon.com/sim/faq#star">Why is there this star (&starf;) behind my username?</a><br />';
+			buffer += '<a href="http://www.smogon.com/sim/faq#star">Why is there this star (&starf;) in front of my username?</a><br />';
 		}
 		if (target === 'staff') {
 			matched = true;
@@ -1464,6 +1493,10 @@ var commands = exports.commands = {
 		if (target === 'autoconfirmed' || target === 'ac') {
 			matched = true;
 			buffer += "A user is autoconfirmed when they have won at least one rated battle and have been registered for a week or longer.<br />";
+		}
+		if (target === 'customavatar' || target === 'ca') {
+			matched = true;
+			buffer += "<a href=\"https://www.smogon.com/sim/faq#customavatar\">How can I get a custom avatar?</a><br />";
 		}
 		if (!matched) {
 			return this.sendReply("The FAQ entry '" + target + "' was not found. Try /faq for general help.");
@@ -1486,41 +1519,44 @@ var commands = exports.commands = {
 		}
 		if (target === 'overused' || target === 'ou') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3511596/\">np: OU Stage 5</a><br />";
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3491371/\">OU Banlist</a><br />";
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3502428/\">OU Viability Rankings</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3521201/\">OU Metagame Discussion</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/dex/xy/tags/ou/\">OU Banlist</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3521602/\">OU Viability Rankings</a><br />";
 		}
 		if (target === 'ubers' || target === 'uber') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3513127/\">np: XY Ubers Gengarite Suspect Test</a><br />";
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3496305/\">Ubers Viability Rankings</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3522911/\">Ubers Metagame Discussion</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3523419/\">Ubers Viability Rankings</a><br />";
 		}
 		if (target === 'underused' || target === 'uu') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3516640/\">np: UU Stage 3</a><br />";
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3502698/#post-5323505\">UU Banlist</a><br />";
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3500340/\">UU Viability Rankings</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3522744/\">np: UU Stage 1</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/dex/xy/tags/uu/\">UU Banlist</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3523649/\">UU Viability Rankings</a><br />";
 		}
 		if (target === 'rarelyused' || target === 'ru') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3515615/\">np: RU Stage 4</a><br />";
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3506500/\">RU Viability Rankings</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3522572/\">np: RU Stage 5</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/dex/xy/tags/ru/\">RU Banlist</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3523627/\">RU Viability Rankings</a><br />";
 		}
 		if (target === 'neverused' || target === 'nu') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3516675/\">np: NU Stage 2</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3522559/\">np: NU Stage 3</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/dex/xy/tags/nu/\">NU Banlist</a><br />";
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3509494/\">NU Viability Rankings</a><br />";
 		}
 		if (target === 'littlecup' || target === 'lc') {
 			matched = true;
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3505710/\">LC Metagame Discussion</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3490462/\">LC Banlist</a><br />";
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3496013/\">LC Viability Rankings</a><br />";
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3490462/\">Official LC Banlist</a><br />";
 		}
 		if (target === 'smogondoubles' || target === 'doubles') {
 			matched = true;
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3509279/\">np: Doubles Stage 3.5</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3523833/\">np: Doubles Stage 1</a><br />";
 			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3498688/\">Doubles Banlist</a><br />";
-			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3496306/\">Doubles Viability Rankings</a><br />";
+			buffer += "- <a href=\"https://www.smogon.com/forums/threads/3522814/\">Doubles Viability Rankings</a><br />";
 		}
 		if (!matched) {
 			return this.sendReply("The Tiers entry '" + target + "' was not found. Try /tiers for general help.");
@@ -1560,7 +1596,7 @@ var commands = exports.commands = {
 		} else if (generation === 'gsc' || generation === 'gs' || generation === '2' || generation === 'two') {
 			generation = 'gs';
 			genNumber = 2;
-		} else if(generation === 'rby' || generation === 'rb' || generation === '1' || generation === 'one') {
+		} else if (generation === 'rby' || generation === 'rb' || generation === '1' || generation === 'one') {
 			generation = 'rb';
 			genNumber = 1;
 		} else {
@@ -1641,7 +1677,7 @@ var commands = exports.commands = {
 		if (!target) return this.parse('/help dice');
 		if (!this.canBroadcast()) return;
 		var d = target.indexOf("d");
-		if (d != -1) {
+		if (d >= 0) {
 			var num = parseInt(target.substring(0, d));
 			var faces;
 			if (target.length > d) faces = parseInt(target.substring(d + 1));
@@ -1690,17 +1726,18 @@ var commands = exports.commands = {
 		}
 	},
 
-	showimage: function (target, room, user) {
-		if (!target) return this.parse('/help showimage');
-		if (!this.can('declare', room)) return false;
+	postimage: 'image',
+	image: function (target, room, user) {
+		if (!target) return this.sendReply('Usage: /image link, size');
+		if (!this.can('ban', room)) return false;
 		if (!this.canBroadcast()) return;
 
 		var targets = target.split(',');
-		if (targets.length != 3) {
-			return this.parse('/help showimage');
+		if (targets.length !== 2) {
+			return this.sendReply('|raw|<center><img src="' + Tools.escapeHTML(targets[0]) + '" alt="" width="50%"/></center>');
 		}
-
-		this.sendReply('|raw|<img src="' + Tools.escapeHTML(targets[0]) + '" alt="" width="' + toId(targets[1]) + '" height="' + toId(targets[2]) + '" />');
+		if (parseInt(targets[1]) <= 0 || parseInt(targets[1]) > 100) return this.parse('Usage: /image link, size (1-100)');
+		this.sendReply('|raw|<center><img src="' + Tools.escapeHTML(targets[0]) + '" alt="" width="' + toId(targets[1]) + '%"/></center>');
 	},
 
 	htmlbox: function (target, room, user) {
@@ -1756,103 +1793,6 @@ var commands = exports.commands = {
 		}
 		this.privateModCommand("(" + user.name + " has removed from the spamroom user list: " + targets.join(", ") + ")");
 	},
-
-	customavatars: 'customavatar',
-	customavatar: (function () {
-		const script = function () {/*
-			FILENAME=`mktemp`
-			function cleanup {
-				rm -f $FILENAME
-			}
-			trap cleanup EXIT
-
-			set -xe
-
-			timeout 10 wget "$1" -nv -O $FILENAME
-
-			FRAMES=`identify $FILENAME | wc -l`
-			if [ $FRAMES -gt 1 ]; then
-				EXT=".gif"
-			else
-				EXT=".png"
-			fi
-
-			timeout 10 convert $FILENAME -layers TrimBounds -coalesce -adaptive-resize 80x80\> -background transparent -gravity center -extent 80x80 "$2$EXT"
-		*/}.toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
-
-		var pendingAdds = {};
-		return function (target) {
-			var parts = target.split(',');
-			var cmd = parts[0].trim().toLowerCase();
-
-			if (cmd in {'':1, show:1, view:1, display:1}) {
-				var message = "";
-				for (var a in Config.customAvatars)
-					message += "<strong>" + Tools.escapeHTML(a) + ":</strong> " + Tools.escapeHTML(Config.customAvatars[a]) + "<br />";
-				return this.sendReplyBox(message);
-			}
-
-			if (!this.can('customavatar')) return false;
-
-			switch (cmd) {
-				case 'set':
-					var userid = toId(parts[1]);
-					var user = Users.getExact(userid);
-					var avatar = parts.slice(2).join(',').trim();
-
-					if (!userid) return this.sendReply("You didn't specify a user.");
-					if (Config.customAvatars[userid]) return this.sendReply(userid + " already has a custom avatar.");
-
-					var hash = require('crypto').createHash('sha512').update(userid + '\u0000' + avatar).digest('hex').slice(0, 8);
-					pendingAdds[hash] = {userid: userid, avatar: avatar};
-					parts[1] = hash;
-
-					if (!user) {
-						this.sendReply("Warning: " + userid + " is not online.");
-						this.sendReply("If you want to continue, use: /customavatar forceset, " + hash);
-						return;
-					}
-
-					/* falls through */
-				case 'forceset':
-					var hash = parts[1].trim();
-					if (!pendingAdds[hash]) return this.sendReply("Invalid hash.");
-
-					var userid = pendingAdds[hash].userid;
-					var avatar = pendingAdds[hash].avatar;
-					delete pendingAdds[hash];
-
-					require('child_process').execFile('bash', ['-c', script, '-', avatar, './config/avatars/' + userid], function (e, out, err) {
-						if (e) {
-							this.sendReply(userid + "'s custom avatar failed to be set. Script output:");
-							(out + err).split('\n').forEach(this.sendReply.bind(this));
-							return;
-						}
-
-						reloadCustomAvatars();
-						this.sendReply(userid + "'s custom avatar has been set.");
-					}.bind(this));
-					break;
-
-				case 'delete':
-					var userid = toId(parts[1]);
-					if (!Config.customAvatars[userid]) return this.sendReply(userid + " does not have a custom avatar.");
-
-					if (Config.customAvatars[userid].toString().split('.').slice(0, -1).join('.') !== userid)
-						return this.sendReply(userid + "'s custom avatar (" + Config.customAvatars[userid] + ") cannot be removed with this script.");
-					require('fs').unlink('./config/avatars/' + Config.customAvatars[userid], function (e) {
-						if (e) return this.sendReply(userid + "'s custom avatar (" + Config.customAvatars[userid] + ") could not be removed: " + e.toString());
-
-						delete Config.customAvatars[userid];
-						this.sendReply(userid + "'s custom avatar removed successfully");
-					}.bind(this));
-					break;
-
-				default:
-					return this.sendReply("Invalid command. Valid commands are `/customavatar set, user, avatar` and `/customavatar delete, user`.");
-			}
-		};
-	})(),
 
 	/*********************************************************
 	 * Help commands
@@ -1985,7 +1925,7 @@ var commands = exports.commands = {
 			this.sendReply("/dexsearch [type], [move], [move], ... - Searches for Pokemon that fulfill the selected criteria.");
 			this.sendReply("Search categories are: type, tier, color, moves, ability, gen.");
 			this.sendReply("Valid colors are: green, red, blue, white, brown, yellow, purple, pink, gray and black.");
-			this.sendReply("Valid tiers are: Uber/OU/BL/UU/BL2/RU/BL3/NU/PU/LC/CAP.");
+			this.sendReply("Valid tiers are: Uber/OU/BL/UU/BL2/RU/BL3/NU/PU/NFE/LC/CAP.");
 			this.sendReply("Types must be followed by ' type', e.g., 'dragon type'.");
 			this.sendReply("Parameters can be excluded through the use of '!', e.g., '!water type' excludes all water types.");
 			this.sendReply("The parameter 'mega' can be added to search for Mega Evolutions only, and the parameters 'FE' or 'NFE' can be added to search fully or not-fully evolved Pokemon only.");
@@ -2008,6 +1948,10 @@ var commands = exports.commands = {
 			matched = true;
 			this.sendReply("/ignore [user] - Ignores all messages from the user [user].");
 			this.sendReply("Note that staff messages cannot be ignored.");
+		}
+		if (target === 'unignore') {
+			matched = true;
+			this.sendReply("/unignore [user] - Removes user [user] from your ignore list.");
 		}
 		if (target === 'invite') {
 			matched = true;

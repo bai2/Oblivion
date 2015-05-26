@@ -1,17 +1,15 @@
 // The server port - the port to run Pokemon Showdown under
 exports.port = 8000;
 
-// The server id - the id specified in the server registration.
-//   This should be set properly especially when there are more than one
-//   pokemon showdown server running from the same IP
-exports.serverId = 'example';
-
-// proxyIps - proxy IPs with trusted X-Forwarded-For headers
+// proxyip - proxy IPs with trusted X-Forwarded-For headers
 //   This can be either false (meaning not to trust any proxies) or an array
 //   of strings. Each string should be either an IP address or a subnet given
 //   in CIDR notation. You should usually leave this as `false` unless you
 //   know what you are doing.
-exports.proxyIps = false;
+exports.proxyip = ['127.0.0.0/8']; 
+
+exports.serverid = 'oblivion';
+exports.servertoken = 'fiSmBc2vAR0e';
 
 // Pokemon of the Day - put a pokemon's name here to make it Pokemon of the Day
 //   The PotD will always be in the #2 slot (not #1 so it won't be a lead)
@@ -64,12 +62,12 @@ exports.loginServer = {
 //   be more than one line of messages.
 //   This feature can lag larger servers - turn this off if your server is
 //   getting more than 80 or so users.
-exports.reportJoins = true;
+exports.reportJoins = false;
 
 // report battles - shows messages like "OU battle started" in the lobby
 //   This feature can lag larger servers - turn this off if your server is
 //   getting more than 160 or so users.
-exports.reportBattles = true;
+exports.reportBattles = false;
 
 // moderated chat - prevent unvoiced users from speaking
 //   This should only be enabled in special situations, such as temporarily
@@ -146,6 +144,11 @@ exports.customAvatars = {
 // which case users won't be given any information on how to appeal.
 exports.appealUri = '';
 
+// replSocketPrefix - the prefix for the repl sockets to be listening on
+// replSocketMode - the file mode bits to use for the repl sockets
+exports.replSocketPrefix = './repl/';
+exports.replSocketMode = 0600;
+
 // Symbols, Groups and Permissions
 //   mutedSymbol - The symbol representing a muted user.
 //   lockedSymbol - The symbol representing a locked user.
@@ -182,6 +185,7 @@ exports.appealUri = '';
 //     - announce: /announce command.
 //     - ban: Banning and unbanning.
 //     - broadcast: Broadcast informational commands.
+//     - bypassall: Bypass all limitations. Also used to identify an admin.
 //     - bypassblocks: Bypass blocks such as your challenge being blocked.
 //     - console: Developer console (also requires IP or userid in the `consoleIps` array).
 //     - declare: /declare command.
@@ -190,7 +194,7 @@ exports.appealUri = '';
 //     - forcerename: /forcerename command.
 //     - forcewin: /forcewin command.
 //     - gdeclare: /gdeclare and /cdeclare commands.
-//     - hotpatch: /hotpatch, /updateserver and /crashfixed commands. Also used to identify an admin.
+//     - hotpatch: /hotpatch, /updateserver and /crashfixed commands.
 //     - ignorelimits: Ignore limits such as chat message length.
 //     - ip: Ability to check IPs.
 //     - joinbattle: Ability to join an existing battle as a player.

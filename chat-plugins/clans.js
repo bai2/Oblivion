@@ -1,5 +1,3 @@
-var elo = require('elo-rank')();
-
 function ratingToName(rating) {
 	if (rating > 1500)
 		return "Gold";
@@ -199,7 +197,7 @@ var ClanRoom = exports.ClanRoom = (function () {
 		for (var c in this.challengesFrom) this.rejectChallengeFrom(c);
 		this.endCurrentWar();
 
-		Rooms.ChatRoom.destroy.call(this);
+		Rooms.ChatRoom.prototype.destroy.call(this);
 	};
 
 	return ClanRoom;
@@ -283,6 +281,18 @@ var War = exports.War = (function () {
 	return War;
 })();
 
+var patchRooms = exports.patchRooms = function () {
+	for (var r = 0; r < Rooms.global.chatRooms.length; ++r) {
+		var room = Rooms.global.chatRooms[r];
+		if (room.isClanRoom && !room.availableMembers) {
+			var newRoom = new ClanRoom(room.title, room.chatRoomData);
+			Rooms.global.chatRooms[r] = newRoom;
+			Rooms.rooms[room.id] = newRoom;
+		}
+	}
+};
+patchRooms();
+
 var getClans = exports.getClans = function () {
 	var results = [];
 	for (var r in Rooms.rooms)
@@ -305,22 +315,19 @@ var getClansFromMember = exports.getFromMember = function (user) {
 
 var createClan = exports.createClan = function (name) {
 	if (Rooms.get(toId(name))) return false;
-	return Rooms.global.addChatRoom(name, {isClanRoom: true});
+	if (!Rooms.global.addChatRoom(name)) return false;
+
+	var room = Rooms.get(toId(name));
+	room.isClanRoom = room.chatRoomData.isClanRoom = true;
+	Rooms.global.writeChatRoomData();
+	patchRooms();
+	return room;
 };
 var deleteClan = exports.deleteClan = function (name) {
 	var room = getClan(name);
 	if (!room) return false;
 	return Rooms.global.removeChatRoom(toId(name));
 };
-
-for (var r = 0; r < Rooms.global.chatRooms.length; ++r) {
-	var room = Rooms.global.chatRooms[r];
-	if (room.isClanRoom && !room.availableMembers) {
-		var newRoom = new ClanRoom(room.title, room.chatRoomData);
-		Rooms.global.chatRooms[r] = newRoom;
-		Rooms.rooms[room.id] = newRoom;
-	}
-}
 
 var oldWin = Rooms.BattleRoom.prototype.win;
 Rooms.BattleRoom.prototype.win = function (winner) {
@@ -382,7 +389,6 @@ exports.commands = {
 		if (!clans[0]) {
 			this.sendReply('|raw|' +
 				"<center>" +
-					"<img src=\"http://i.imgur.com/yZ6G3fS.png\" />" +
 					"<div class=\"clans-info\">" +
 						"<strong>Clans:</strong><br />" +
 						getClans().map(function (clan) {
@@ -396,7 +402,6 @@ exports.commands = {
 							return '<a class="ilink" href="/' + clan.id + '"><strong>' + Tools.escapeHTML(clan.name) + ':</strong></a> ' + clan.rating + " (" + clan.ratingName + ") " + clan.wins + "/" + clan.losses + "/" + clan.draws;
 						}).join('<br />') +
 					"</div>" +
-					"<img src=\"http://i.imgur.com/qFllIAe.png\" />" +
 				"</center>"
 			);
 			return;
@@ -410,7 +415,6 @@ exports.commands = {
 			var rating = clan.getRating();
 			this.sendReply('|raw|' +
 				"<center>" +
-					"<img src=\"http://i.imgur.com/yZ6G3fS.png\" />" +
 					"<div class=\"clan-info\">" +
 						'<h1>' + Tools.escapeHTML(clan.title) + '</h1>' +
 						(clan.introMessage || '') +
@@ -420,7 +424,6 @@ exports.commands = {
 						"<strong>Members:</strong> " + Tools.escapeHTML(Object.keys(clan.auth || {}).sort().join(", ")) + '<br />' +
 						"<button name=\"joinRoom\" value=\"" + clan.id + "\">Join</button>" +
 					"</div>" +
-					"<img src=\"http://i.imgur.com/qFllIAe.png\" />" +
 				"</center>"
 			);
 		}
@@ -516,5 +519,5 @@ exports.commands = {
 				return matchup.isEnded ? "" : '<strong>' + Tools.escapeHTML(matchup.from) + "</strong> vs <strong>" + Tools.escapeHTML(matchup.to);
 			}).join('<br />')
 		);
-	},
+	}
 };

@@ -73,10 +73,10 @@ SimulatorProcess.processes.push(new SimulatorProcess());
 
 var slice = Array.prototype.slice;
 
-var Battle = (function (){
+var Battle = (function () {
 	function Battle(id, format, rated, room) {
 		if (battles[id]) {
-			throw new Error("Battle with ID "+id+" already exists.");
+			throw new Error("Battle with ID " + id + " already exists.");
 		}
 
 		this.id = id;
@@ -162,6 +162,13 @@ var Battle = (function (){
 			this.inactiveSide = -1;
 			break;
 
+		case 'sideupdate':
+			player = this.getPlayer(lines[2]);
+			if (player) {
+				player.sendTo(this.id, lines[3]);
+			}
+			break;
+
 		case 'callback':
 			player = this.getPlayer(lines[2]);
 			if (player) {
@@ -236,6 +243,9 @@ var Battle = (function (){
 			delete this.players[slot].battles[this.id];
 		}
 		if (user) {
+			if (user.battles[this.id]) {
+				return false;
+			}
 			user.battles[this.id] = true;
 		}
 		this.players[slot] = (user || null);
@@ -280,6 +290,7 @@ var Battle = (function (){
 		}
 		// console.log('joining: ' + user.name + ' ' + slot);
 		if (this.players[slot] || slot >= this.players.length) return false;
+		if (user === this.players[0] || user === this.players[1]) return false;
 
 		for (var i = 0; i < user.connections.length; i++) {
 			var connection = user.connections[i];

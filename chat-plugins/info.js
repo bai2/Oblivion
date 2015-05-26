@@ -1,17 +1,17 @@
 exports.commands = {
 	foro: function (target, room, user, connection) {
 		if (!this.canBroadcast()) return;
-		this.sendReplyBox('<a href="http://www.pokemon-hispano.comxa.com/" target="_BLANK">Visita nuestro foro!</a>');
+		this.sendReplyBox('<a href="http://oblivionshowdown.boards.net//" target="_BLANK">Visita nuestro foro!</a>');
 	},
 
 	radio: function (target, room, user, connection) {
 		if (!this.canBroadcast()) return;
-		this.sendReplyBox('<div class="infobox"><center><a href="http://plug.dj/pokemon-hispano-3/"><img src="http://i.imgur.com/2olrf6c.gif" height="100" width="100"></a><br><font size=3><b><font color="blue">Radio de PokÃ©mon Hispano');
+		this.sendReplyBox('<div class="infobox"><center><a href="http://plug.dj/oblivion-/"><img src="http://i.imgur.com/2olrf6c.gif" height="100" width="100"></a><br><font size=3><b><font color="blue">Radio de Pokémon Hispano');
 	},
 
 	funciones: function (target, room, user, connection) {
 		if (!this.canBroadcast()) return;
-		this.sendReplyBox('<b>+Voices:</b> Los voices son personas destacadas dentro de los usuarios y seleccionados por el Staff para ser los encargados de resolver dudas, a travÃ©s de los comandos !data, !learn, !effectiveness, !foro, !funciones, !reglastorneos, !staff y !bienvenido entre otros comandos. Para ser voice, el primer paso es no solicitarlo, entrar regularmente al servidor y participar activamente del chat y no tener historial de faltas a las normas. Los Voices a pruebas pueden ser otorgados por ganar algÃºn concurso/torneo, pero estos a la primera falta contra las normas o no participar activamente del chat ayudando a los usuarios, pueden ser removidos.<br /><br /><br /><b>%Drivers:</b> Los Drivers son asistentes de los moderadores ayudan con la moderaciÃ³n del chat pudiendo dar advertencias a los que incurren en faltas y de no haber moderador presente silenciar a los problemÃ¡ticos por un tiempo mÃ¡ximo de 7 minutos.<br /><br /><b>@Moderadores:</b> Los moderadores asisten a los Administradores y Lideres moderando el chat, son los mÃ¡ximos responsables del cumplimiento de las reglas y por ende tambiÃ©n deben saber respetarlas. Pudiendo acceder al poder del destierro con estos fines.<br /><br /><br /><b>&Lideres:</b> Los Lideres asisten a los Administradores en la moderaciÃ³n de batallas y control general de el servidor.<br /><br /><b>~Administradores:</b> Los Administradores son la mÃ¡xima autoridad del servidor, son los encargados del correcto funcionamiento del server y tambiÃ©n se encargan de el ascenso de los miembros del Staff y no pertenecientes a Ã©l.');
+		this.sendReplyBox('<b>+Voices:</b> Los voices son personas destacadas dentro de los usuarios y seleccionados por el Staff para ser los encargados de resolver dudas, a través de los comandos !data, !learn, !effectiveness, !foro, !funciones, !reglastorneos, !staff y !bienvenido entre otros comandos. Para ser voice, el primer paso es no solicitarlo, entrar regularmente al servidor y participar activamente del chat y no tener historial de faltas a las normas. Los Voices a pruebas pueden ser otorgados por ganar algún concurso/torneo, pero estos a la primera falta contra las normas o no participar activamente del chat ayudando a los usuarios, pueden ser removidos.<br /><br /><br /><b>%Drivers:</b> Los Drivers son asistentes de los moderadores ayudan con la moderación del chat pudiendo dar advertencias a los que incurren en faltas y de no haber moderador presente silenciar a los problemáticos por un tiempo mÃ¡ximo de 7 minutos.<br /><br /><b>@Moderadores:</b> Los moderadores asisten a los Administradores y Lideres moderando el chat, son los máximos responsables del cumplimiento de las reglas y por ende también deben saber respetarlas. Pudiendo acceder al poder del destierro con estos fines.<br /><br /><br /><b>&Lideres:</b> Los Lideres asisten a los Administradores en la moderación de batallas y control general de el servidor.<br /><br /><b>~Administradores:</b> Los Administradores son la mÃ¡xima autoridad del servidor, son los encargados del correcto funcionamiento del server y también se encargan de el ascenso de los miembros del Staff y no pertenecientes a él.');
 	},
 
 	reglastorneos: function (target, room, user, connection) {
@@ -21,34 +21,16 @@ exports.commands = {
 
 	staff: function (target, room, user, connection) {
 		if (!this.canBroadcast()) return;
-		this.sendReplyBox('<a href="http://pokemon-hispano.comxa.com/showteam.php" target="_BLANK">Staff</a>');
+		this.sendReplyBox('<a href="" target="_BLANK">Staff</a>');
 	},
 
 	bienvenido: function (target, room, user, connection) {
 		if (!this.canBroadcast()) return;
-		this.sendReplyBox('Bienvenido a Pokemon Hispano. La guia de inicio puedes encontrarla ingresando <a href="http://pokemon-hispano.comxa.com/showthread.php?tid=60" target="_BLANK">aqui</a>.');
+		this.sendReplyBox('Bienvenido al servidor oblivion. La guia de inicio puedes encontrarla ingresando <a href="" target="_BLANK">aqui</a>.');
 	},
 
-	ligaph: function (target, room, user, connection) {
+	ligaoblivion: function (target, room, user, connection) {
 		if (!this.canBroadcast()) return;
-		this.sendReplyBox('Toda la informacion de nuestra liga puede ser encontrada <a href="http://pokemon-hispano.comxa.com/showthread.php?tid=35" target="_BLANK">aquÃ­</a>.');
+		this.sendReplyBox('Toda la informacion de nuestra liga <a href="http://oblivionshowdown.boards.net/board/7/liga-oblivion" target="_BLANK">aquí­</a>.');
 	},
-
-
-	gth: function (target, room, user) {
-		if(!this.canBroadcast()) return;
-		this.sendReplyBox('<div class="infobox"><center><img src="http://s7.postimg.org/cwkpinh5n/logogthfull.png" height="170" width="250"><br><b>MirÃ¡ las Ãºltimas novedades del <a href="htthttp://pokemon-hispano.comxa.com/forumdisplay.php?fid=66://pokemon-hispano.comxa.com/showteam.php" target="_BLANK">GRAN TOUR HISPANO!</a>');
-	},
-
-	posho: function (target, room, user) {
-		this.add('Posho eres un ' +target);
-		user.popup("<font color=\"red\">HAZ SIDO KICKEADO POR EL PODER DE POSHO POR DECIRLE ' </font>" +target);
-		user.disconnectAll();
-	},
-
-	rule: 'reglas',
-	reglas: function (target, room, user) {
-		if (!this.canBroadcast()) return;
-		this.sendReplyBox('Por favor sigue las siguientes reglas:<br /><a href="http://pastebin.com/CSWuasXc" target="_blank">Reglas</a> en EspaÃ±ol<br /><a href="http://pastebin.com/eZ3dtX2c">Regras</a> em PortuguÃªs (<b>Gracias a Dlinkoto</b>)<br />');
-	}
 };

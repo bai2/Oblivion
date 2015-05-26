@@ -8,11 +8,7 @@ exports.BattleStatuses = {
 			}
 			this.add('-status', target, 'brn');
 		},
-		onBasePower: function (basePower, attacker, defender, move) {
-			if (move && move.category === 'Physical' && attacker && attacker.ability !== 'guts' && move.id !== 'facade') {
-				return this.chainModify(0.5); // This should really take place directly in the damage function but it's here for now
-			}
-		},
+		// Damage reduction is handled directly in the battle-engine.js damage function
 		onResidualOrder: 9,
 		onResidual: function (pokemon) {
 			this.damage(pokemon.maxhp / 8);
@@ -24,11 +20,11 @@ exports.BattleStatuses = {
 			this.add('-status', target, 'par');
 		},
 		onModifySpe: function (speMod, pokemon) {
-			if (pokemon.ability !== 'quickfeet') {
+			if (!pokemon.hasAbility('quickfeet')) {
 				return this.chain(speMod, 0.25);
 			}
 		},
-		onBeforeMovePriority: 2,
+		onBeforeMovePriority: 1,
 		onBeforeMove: function (pokemon) {
 			if (this.random(4) === 0) {
 				this.add('cant', pokemon, 'par');
@@ -44,9 +40,9 @@ exports.BattleStatuses = {
 			this.effectData.startTime = this.random(2, 5);
 			this.effectData.time = this.effectData.startTime;
 		},
-		onBeforeMovePriority: 2,
+		onBeforeMovePriority: 10,
 		onBeforeMove: function (pokemon, target, move) {
-			if (pokemon.getAbility().isHalfSleep) {
+			if (pokemon.hasAbility('earlybird')) {
 				pokemon.statusData.time--;
 			}
 			pokemon.statusData.time--;
@@ -65,7 +61,7 @@ exports.BattleStatuses = {
 		effectType: 'Status',
 		onStart: function (target) {
 			this.add('-status', target, 'frz');
-			if (target.species === 'Shaymin-Sky' && target.baseTemplate.species === target.species) {
+			if (target.template.species === 'Shaymin-Sky' && target.baseTemplate.baseSpecies === 'Shaymin') {
 				var template = this.getTemplate('Shaymin');
 				target.formeChange(template);
 				target.baseTemplate = template;
@@ -73,17 +69,24 @@ exports.BattleStatuses = {
 				target.baseAbility = target.ability;
 				target.details = template.species + (target.level === 100 ? '' : ', L' + target.level) + (target.gender === '' ? '' : ', ' + target.gender) + (target.set.shiny ? ', shiny' : '');
 				this.add('detailschange', target, target.details);
-				this.add('message', target.species + " has reverted to Land Forme! (placeholder)");
+				this.add('-formechange', target, 'Shaymin', '[msg]');
 			}
 		},
-		onBeforeMovePriority: 2,
+		onBeforeMovePriority: 10,
 		onBeforeMove: function (pokemon, target, move) {
-			if (move.thawsUser || this.random(5) === 0) {
+			if (move.flags['defrost']) return;
+			if (this.random(5) === 0) {
 				pokemon.cureStatus();
 				return;
 			}
 			this.add('cant', pokemon, 'frz');
 			return false;
+		},
+		onModifyMove: function (move, pokemon) {
+			if (move.flags['defrost']) {
+				this.add('-curestatus', pokemon, 'frz', '[from] move: ' + move);
+				pokemon.setStatus('');
+			}
 		},
 		onHit: function (target, source, move) {
 			if (move.thawsTarget || move.type === 'Fire' && move.category !== 'Status') {
@@ -133,6 +136,7 @@ exports.BattleStatuses = {
 		onEnd: function (target) {
 			this.add('-end', target, 'confusion');
 		},
+		onBeforeMovePriority: 3,
 		onBeforeMove: function (pokemon) {
 			pokemon.volatiles.confusion.time--;
 			if (!pokemon.volatiles.confusion.time) {
@@ -149,7 +153,7 @@ exports.BattleStatuses = {
 	},
 	flinch: {
 		duration: 1,
-		onBeforeMovePriority: 1,
+		onBeforeMovePriority: 8,
 		onBeforeMove: function (pokemon) {
 			if (!this.runEvent('Flinch', pokemon)) {
 				return;
@@ -173,11 +177,11 @@ exports.BattleStatuses = {
 	partiallytrapped: {
 		duration: 5,
 		durationCallback: function (target, source) {
-			if (source.item === 'gripclaw') return 8;
+			if (source.hasItem('gripclaw')) return 8;
 			return this.random(5, 7);
 		},
 		onStart: function (pokemon, source) {
-			this.add('-activate', pokemon, 'move: ' +this.effectData.sourceEffect, '[of] ' + source);
+			this.add('-activate', pokemon, 'move: ' + this.effectData.sourceEffect, '[of] ' + source);
 		},
 		onResidualOrder: 11,
 		onResidual: function (pokemon) {
@@ -185,7 +189,7 @@ exports.BattleStatuses = {
 				pokemon.removeVolatile('partiallytrapped');
 				return;
 			}
-			if (this.effectData.source.item === 'bindingband') {
+			if (this.effectData.source.hasItem('bindingband')) {
 				this.damage(pokemon.maxhp / 6);
 			} else {
 				this.damage(pokemon.maxhp / 8);
@@ -251,7 +255,7 @@ exports.BattleStatuses = {
 			if (!this.activeMove.id || this.activeMove.sourceEffect && this.activeMove.sourceEffect !== this.activeMove.id) return false;
 			this.effectData.move = this.activeMove.id;
 		},
-		onModifyPokemon: function (pokemon) {
+		onDisableMove: function (pokemon) {
 			if (!pokemon.getItem().isChoice || !pokemon.hasMove(this.effectData.move)) {
 				pokemon.removeVolatile('choicelock');
 				return;
@@ -262,19 +266,23 @@ exports.BattleStatuses = {
 			var moves = pokemon.moveset;
 			for (var i = 0; i < moves.length; i++) {
 				if (moves[i].id !== this.effectData.move) {
-					moves[i].disabled = true;
+					pokemon.disableMove(moves[i].id, false, this.effectData.sourceEffect);
 				}
 			}
 		}
 	},
 	mustrecharge: {
 		duration: 2,
+		onBeforeMovePriority: 11,
 		onBeforeMove: function (pokemon) {
 			this.add('cant', pokemon, 'recharge');
 			pokemon.removeVolatile('mustrecharge');
 			return false;
 		},
-		onLockMove: 'recharge'
+		onLockMove: function (pokemon) {
+			this.add('-mustrecharge', pokemon);
+			return 'recharge';
+		}
 	},
 	futuremove: {
 		// this is a side condition
@@ -307,12 +315,30 @@ exports.BattleStatuses = {
 					continue;
 				}
 
-				this.add('-message', '' + move.name + ' hit! (placeholder)');
+				this.add('-end', target, 'move: ' + move.name);
 				target.removeVolatile('Protect');
 				target.removeVolatile('Endure');
 
-				if (typeof posData.moveData.affectedByImmunities === 'undefined') {
-					posData.moveData.affectedByImmunities = true;
+				if (posData.moveData.ignoreImmunity === undefined) {
+					posData.moveData.ignoreImmunity = false;
+				}
+
+				if (target.hasAbility('wonderguard') && this.gen > 5) {
+					this.debug('Wonder Guard immunity: ' + move.id);
+					if (target.runEffectiveness(move) <= 0) {
+						this.add('-activate', target, 'ability: Wonder Guard');
+						this.effectData.positions[i] = null;
+						return null;
+					}
+				}
+
+				// Prior to gen 5, these moves had no STAB and no effectiveness.
+				// This is done here and to moveData's type for two reasons:
+				// - modifyMove event happens before the moveHit function is run.
+				// - moveData here is different from move, as one is generated here and the other by the move itself.
+				// So here we centralise any future hit move getting typeless on hit as it should be.
+				if (this.gen < 5) {
+					posData.moveData.type = '???';
 				}
 
 				this.moveHit(target, posData.source, move, posData.moveData);
@@ -327,7 +353,7 @@ exports.BattleStatuses = {
 	stall: {
 		// Protect, Detect, Endure counter
 		duration: 2,
-		counterMax: 256,
+		counterMax: 729,
 		onStart: function () {
 			this.effectData.counter = 3;
 		},
@@ -357,17 +383,15 @@ exports.BattleStatuses = {
 		duration: 1,
 		onBasePowerPriority: 8,
 		onBasePower: function (basePower, user, target, move) {
-			var modifier = 4 / 3;
+			var modifier = 0x1547;
 			this.debug('Aura Boost');
 			if (user.volatiles['aurabreak']) {
-				modifier = 0.75;
+				modifier = 0x0C00;
 				this.debug('Aura Boost reverted by Aura Break');
 			}
-			return this.chainModify(modifier);
+			return this.chainModify([modifier, 0x1000]);
 		}
 	},
-
-		// weather
 
 	// weather is implemented here since it's so important to the game
 
@@ -375,7 +399,7 @@ exports.BattleStatuses = {
 		effectType: 'Weather',
 		duration: 5,
 		durationCallback: function (source, effect) {
-			if (source && source.item === 'damprock') {
+			if (source && source.hasItem('damprock')) {
 				return 8;
 			}
 			return 5;
@@ -407,11 +431,39 @@ exports.BattleStatuses = {
 			this.add('-weather', 'none');
 		}
 	},
+	primordialsea: {
+		effectType: 'Weather',
+		duration: 0,
+		onTryMove: function (target, source, effect) {
+			if (effect.type === 'Fire' && effect.category !== 'Status') {
+				this.debug('Primordial Sea fire suppress');
+				this.add('-fail', source, effect, '[from] Primordial Sea');
+				return null;
+			}
+		},
+		onBasePower: function (basePower, attacker, defender, move) {
+			if (move.type === 'Water') {
+				this.debug('Rain water boost');
+				return this.chainModify(1.5);
+			}
+		},
+		onStart: function () {
+			this.add('-weather', 'PrimordialSea');
+		},
+		onResidualOrder: 1,
+		onResidual: function () {
+			this.add('-weather', 'PrimordialSea', '[upkeep]');
+			this.eachEvent('Weather');
+		},
+		onEnd: function () {
+			this.add('-weather', 'none');
+		}
+	},
 	sunnyday: {
 		effectType: 'Weather',
 		duration: 5,
 		durationCallback: function (source, effect) {
-			if (source && source.item === 'heatrock') {
+			if (source && source.hasItem('heatrock')) {
 				return 8;
 			}
 			return 5;
@@ -446,11 +498,42 @@ exports.BattleStatuses = {
 			this.add('-weather', 'none');
 		}
 	},
+	desolateland: {
+		effectType: 'Weather',
+		duration: 0,
+		onTryMove: function (target, source, effect) {
+			if (effect.type === 'Water' && effect.category !== 'Status') {
+				this.debug('Desolate Land water suppress');
+				this.add('-fail', source, effect, '[from] Desolate Land');
+				return null;
+			}
+		},
+		onBasePower: function (basePower, attacker, defender, move) {
+			if (move.type === 'Fire') {
+				this.debug('Sunny Day fire boost');
+				return this.chainModify(1.5);
+			}
+		},
+		onStart: function () {
+			this.add('-weather', 'DesolateLand');
+		},
+		onImmunity: function (type) {
+			if (type === 'frz') return false;
+		},
+		onResidualOrder: 1,
+		onResidual: function () {
+			this.add('-weather', 'DesolateLand', '[upkeep]');
+			this.eachEvent('Weather');
+		},
+		onEnd: function () {
+			this.add('-weather', 'none');
+		}
+	},
 	sandstorm: {
 		effectType: 'Weather',
 		duration: 5,
 		durationCallback: function (source, effect) {
-			if (source && source.item === 'smoothrock') {
+			if (source && source.hasItem('smoothrock')) {
 				return 8;
 			}
 			return 5;
@@ -487,7 +570,7 @@ exports.BattleStatuses = {
 		effectType: 'Weather',
 		duration: 5,
 		durationCallback: function (source, effect) {
-			if (source && source.item === 'icyrock') {
+			if (source && source.hasItem('icyrock')) {
 				return 8;
 			}
 			return 5;
@@ -507,6 +590,27 @@ exports.BattleStatuses = {
 		},
 		onWeather: function (target) {
 			this.damage(target.maxhp / 16);
+		},
+		onEnd: function () {
+			this.add('-weather', 'none');
+		}
+	},
+	deltastream: {
+		effectType: 'Weather',
+		duration: 0,
+		onEffectiveness: function (typeMod, target, type, move) {
+			if (move && move.effectType === 'Move' && type === 'Flying' && typeMod > 0) {
+				this.add('-activate', '', 'deltastream');
+				return 0;
+			}
+		},
+		onStart: function () {
+			this.add('-weather', 'DeltaStream');
+		},
+		onResidualOrder: 1,
+		onResidual: function () {
+			this.add('-weather', 'DeltaStream', '[upkeep]');
+			this.eachEvent('Weather');
 		},
 		onEnd: function () {
 			this.add('-weather', 'none');
