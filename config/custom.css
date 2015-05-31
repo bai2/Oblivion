@@ -264,11 +264,22 @@ color: #eff;
 
 /* Welcome Message */
 .welcome {
-    background: url(http://orig00.deviantart.net/2799/f/2015/135/0/8/sin_t__tulo_b1_by_somnifero-d8th6gk.png) center repeat-y;
-    color: #fff;
+    background: url(http://orig03.deviantart.net/f779/f/2015/146/e/1/sin_t__tulo_b1_by_somnifero-d8ux74e.png) center repeat-y;
+    color: #4CA8B5;
     margin-top: -3px;
     padding: 1px 15px;
-    width: 440px;
+}
+
+.welcome hr {
+    border: 1px dashed #3F3FF3;
+}
+
+.welcome button {
+    background: rgb(130, 56, 162);
+    color: #1CD1BC;
+    border: 1px solid #1CD1BC;
+    font-size: 10pt;
+    padding: 7px;
 }
 
 /* Tienda */
